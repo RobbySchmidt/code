@@ -11,6 +11,8 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@nuxtjs/mdc": "^0.23.2",
     "@nuxtjs/supabase": "2.0.10",
     "@tailwindcss/vite": "^4.3.3",
     "nuxt": "^4.5.2",

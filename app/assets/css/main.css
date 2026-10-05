@@ -1,1 +1,119 @@
 @import "tailwindcss";
+@import "@fontsource-variable/inter";
+
+@theme {
+  --color-ember: #ff5900;
+  --color-abyss: #000710;
+  --color-carbon: #15191e;
+  --color-ink: #000000;
+  --color-paper: #ffffff;
+  --color-fog: #f3f3f7;
+  --color-mist: #b9bbc6;
+  --color-steel: #8b8d98;
+  --color-pewter: #6f737b;
+  --color-graphite: #60646c;
+
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-paper);
+    color: var(--color-graphite);
+    letter-spacing: -0.01em;
+    font-feature-settings: "calt" 0, "liga" 0, "ss03", "cv01", "cv10";
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-ember px-4 py-2 text-sm font-semibold text-paper transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-mist bg-paper px-4 py-2 text-sm font-semibold text-ink transition-colors hover:bg-fog disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 text-sm font-medium text-ink underline-offset-4 hover:underline;
+  }
+
+  .text-link {
+    @apply text-ink underline underline-offset-4;
+  }
+
+  .field-label {
+    @apply mb-2 block text-sm font-medium text-ink;
+  }
+
+  .input {
+    @apply block w-full rounded-xl border border-mist bg-paper px-4 py-3 text-base text-ink placeholder:text-steel;
+  }
+
+  .notice {
+    @apply rounded-xl bg-fog px-4 py-3 text-sm text-ink;
+  }
+
+  .code-block {
+    @apply my-6 overflow-hidden rounded-xl bg-fog;
+  }
+
+  .code-block-bar {
+    @apply flex items-center justify-between gap-4 border-b border-mist/60 px-4 py-2 text-xs text-pewter;
+  }
+
+  .code-block pre {
+    @apply overflow-x-auto p-4 text-sm leading-relaxed;
+    letter-spacing: 0;
+  }
+
+  .lesson-prose {
+    @apply max-w-[640px] text-base leading-relaxed;
+  }
+
+  .lesson-prose h2 {
+    @apply mb-4 mt-12 text-2xl font-medium text-ink first:mt-0;
+  }
+
+  .lesson-prose h3 {
+    @apply mb-3 mt-8 text-xl font-medium text-ink;
+  }
+
+  .lesson-prose :is(h2, h3) a {
+    @apply no-underline;
+  }
+
+  .lesson-prose p {
+    @apply my-4;
+  }
+
+  .lesson-prose ul {
+    @apply my-4 list-disc space-y-2 pl-6;
+  }
+
+  .lesson-prose ol {
+    @apply my-4 list-decimal space-y-2 pl-6;
+  }
+
+  .lesson-prose strong {
+    @apply font-semibold text-ink;
+  }
+
+  .lesson-prose a {
+    @apply text-ink underline underline-offset-4;
+  }
+
+  .lesson-prose :not(pre) > code {
+    @apply rounded-md bg-fog px-1.5 py-0.5 text-[0.9em] text-ink;
+    letter-spacing: 0;
+  }
+
+  .lesson-prose blockquote {
+    @apply my-6 rounded-xl bg-fog px-4 py-3 text-ink;
+  }
+}
