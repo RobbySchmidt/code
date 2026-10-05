@@ -16,6 +16,7 @@ Enthalten:
 - Aufklappbare Musterlösung pro Lektion
 - Konto mit E-Mail und Passwort, inklusive Passwort-Reset
 - Fortschritt pro Konto über den Button „Lektion abschließen“
+- Profilseite mit Fortschritt, „Kurs weitermachen“ und Passwort ändern
 - Der komplette Kursinhalt (13 Lektionen)
 - Platzhalterseiten für Impressum und Datenschutz
 
@@ -41,7 +42,8 @@ Nicht enthalten:
 
 | Seite | Inhalt |
 |---|---|
-| `/` | Kurze Vorstellung des Kurses, darunter die Lektionsliste. Eingeloggt: Häkchen je Lektion, Fortschrittsbalken und „Weiterlernen“ zur nächsten offenen Lektion. |
+| `/` | Kurze Vorstellung des Kurses, darunter die Lektionsliste. Eingeloggt: Häkchen je Lektion, Fortschrittsbalken und „Kurs weitermachen“ (siehe „Kurs weitermachen“). |
+| `/profil` | Nur eingeloggt erreichbar, sonst Weiterleitung zu `/login`. Zeigt E-Mail-Adresse, Fortschrittsbalken, „Kurs weitermachen“, die Lektionsliste mit Häkchen und Abschlussdatum, ein Formular zum Ändern des Passworts und Logout. |
 | `/kurs/[slug]` | Eine Lektion: gerenderter Markdown-Text, Codeblöcke mit Kopier-Button, aufklappbare Musterlösung, „Zurück“/„Weiter“, Button „Lektion abschließen“. Ausgeloggt steht statt des Buttons ein Hinweis mit Link zum Login. |
 | `/login` | Anmeldung mit E-Mail und Passwort |
 | `/registrieren` | Registrierung mit E-Mail und Passwort |
@@ -50,7 +52,17 @@ Nicht enthalten:
 | `/confirm` | Rücksprungseite nach dem Bestätigungslink aus der Registrierungsmail |
 | `/impressum`, `/datenschutz` | Platzhalter, im Fuß verlinkt |
 
-Kopfzeile: Kurstitel, dazu Login-Link bzw. E-Mail-Adresse und Logout.
+Kopfzeile: Kurstitel, dazu Login-Link bzw. Link zum Profil und Logout.
+
+### Kurs weitermachen
+
+Der Button „Kurs weitermachen“ steht auf der Startseite und im Profil und führt zu genau einer Lektion:
+
+1. zur zuletzt geöffneten Lektion, wenn sie veröffentlicht und noch nicht abgeschlossen ist,
+2. sonst zur ersten noch nicht abgeschlossenen Lektion in Kursreihenfolge,
+3. sind alle Lektionen abgeschlossen, steht statt des Buttons „Kurs abgeschlossen“ mit einem Link zur letzten Lektion.
+
+Wer noch keine Lektion geöffnet hat, sieht den Button als „Kurs starten“; er führt zur ersten Lektion. Die zuletzt geöffnete Lektion wird gespeichert, sobald ein eingeloggter Nutzer eine Lektionsseite öffnet.
 
 Lektionsseite auf großen Bildschirmen: links die Lektionsliste mit Häkchen, rechts der Text in gut lesbarer Spaltenbreite. Auf kleinen Bildschirmen liegt die Liste in einem ausklappbaren Menü.
 
@@ -62,7 +74,10 @@ Lektionsseite auf großen Bildschirmen: links die Lektionsliste mit Häkchen, re
 |---|---|---|
 | `useLessons` (Composable) | Lädt die Liste der veröffentlichten Lektionen (ohne Text) und eine einzelne Lektion per Slug | Supabase-Client |
 | `useProgress` (Composable) | Lädt die abgeschlossenen Lektionen des eingeloggten Nutzers, schließt eine Lektion ab oder nimmt den Abschluss zurück | Supabase-Client, Nutzer |
-| `utils/progress.js` | Reine Funktionen: Prozentwert und nächste offene Lektion aus Lektionsliste und Menge der abgeschlossenen IDs | nichts |
+| `useProfile` (Composable) | Lädt die zuletzt geöffnete Lektion des eingeloggten Nutzers und speichert sie beim Öffnen einer Lektion | Supabase-Client, Nutzer |
+| `utils/progress.js` | Reine Funktionen: Prozentwert und Ziel von „Kurs weitermachen“ aus Lektionsliste, Menge der abgeschlossenen IDs und zuletzt geöffneter Lektion | nichts |
+| `ResumeButton` | „Kurs starten“, „Kurs weitermachen“ oder „Kurs abgeschlossen“ | `useLessons`, `useProgress`, `useProfile`, `utils/progress.js` |
+| `PasswordForm` | Passwort ändern im Profil | Supabase-Auth |
 | `LessonList` | Lektionsliste mit Häkchen, für Startseite und Seitenleiste | `useLessons`, `useProgress` |
 | `LessonContent` | Rendert Markdown über `<MDC>`, inklusive Codeblock mit Kopier-Button | `@nuxtjs/mdc` |
 | `LessonSolution` | Aufklappbarer Bereich mit der Musterlösung; wird nur angezeigt, wenn eine Lösung vorhanden ist | `LessonContent` |
@@ -98,12 +113,23 @@ Lektionsseite auf großen Bildschirmen: links die Lektionsliste mit Häkchen, re
 
 Primärschlüssel ist `(user_id, lesson_id)`. Eine Zeile bedeutet „abgeschlossen“; Zurücknehmen löscht die Zeile.
 
+### `public.profiles`
+
+| Spalte | Typ | Hinweis |
+|---|---|---|
+| `user_id` | `uuid`, Primärschlüssel, Verweis auf `auth.users`, `on delete cascade` | |
+| `last_lesson_id` | `bigint`, darf `null` sein, Verweis auf `lessons`, `on delete set null` | Zuletzt geöffnete Lektion |
+| `updated_at` | `timestamptz`, Standard `now()` | |
+
+Die Zeile entsteht beim ersten Öffnen einer Lektion per Upsert; es gibt keinen Trigger bei der Registrierung.
+
 ### Zugriffsregeln (RLS)
 
-RLS ist auf beiden Tabellen aktiv.
+RLS ist auf allen drei Tabellen aktiv.
 
 - `lessons`: `select` für `anon` und `authenticated`, nur Zeilen mit `published = true`. Keine Regeln für `insert`, `update`, `delete`; Änderungen sind nur über das Dashboard möglich.
 - `lesson_progress`: `select`, `insert` und `delete` für `authenticated`, jeweils nur mit `user_id = auth.uid()`. Kein `update`.
+- `profiles`: `select`, `insert` und `update` für `authenticated`, jeweils nur mit `user_id = auth.uid()`. Kein `delete`.
 
 ## Kursinhalt
 
@@ -144,8 +170,8 @@ Ab Lektion 3 endet jede Lektion mit einer Musterlösung, die den vollständigen 
 ## Tests
 
 - **Zugriffsregeln:** Prüfung direkt gegen die Datenbank, dass Unangemeldete keine unveröffentlichten Lektionen sehen und ein Nutzer fremden Fortschritt weder lesen noch anlegen noch löschen kann
-- **Logik:** Vitest-Tests für `utils/progress.js` (Prozentwert, nächste offene Lektion, leere Liste, alles erledigt) und `utils/authErrors.js`
-- **Abläufe:** Registrierung, Bestätigung, Login, Lektion abschließen und zurücknehmen, Passwort-Reset und Logout einmal im Browser durchgespielt
+- **Logik:** Vitest-Tests für `utils/progress.js` (Prozentwert, alle Fälle von „Kurs weitermachen“, leere Liste, alles erledigt) und `utils/authErrors.js`
+- **Abläufe:** Registrierung, Bestätigung, Login, Lektion abschließen und zurücknehmen, „Kurs weitermachen“ nach erneutem Login, Passwort ändern im Profil, Passwort-Reset und Logout einmal im Browser durchgespielt
 - **Kursinhalt:** Die Todo-App wird in einem Wegwerf-Ordner exakt nach den Lektionen nachgebaut; jeder Zwischenstand muss laufen und der Musterlösung entsprechen
 
 ## Offene Punkte vor dem Livegang
