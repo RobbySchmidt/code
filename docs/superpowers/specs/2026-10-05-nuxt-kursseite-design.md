@@ -76,7 +76,7 @@ Die Blöcke werden über Gruppierung, Überschriften und Etiketten getrennt, nic
 
 ## Gestaltung
 
-Stilreferenz ist das von Robby gelieferte Design-System (Auszug aus brex.com). Übernommen werden Farben, Typografie-Maße, Abstände, Radien und die Regeln; Logo, Markenname und Bildwelt von Brex werden nicht übernommen.
+Stilreferenz ist das vorgegebene Design-System (Auszug aus brex.com). Übernommen werden Farben, Typografie-Maße, Abstände, Radien und die Regeln; Logo, Markenname und Bildwelt von Brex werden nicht übernommen.
 
 ### Token
 
@@ -220,7 +220,7 @@ Die App entsteht in drei Durchgängen: erst als HTML-Gerüst ohne Funktion, dann
 
 16. **Geschafft:** Rückblick und Ideen zum Weitermachen
 
-Ab Lektion 3 endet jede Lektion mit einer Musterlösung, die den vollständigen Stand der geänderten Dateien zeigt.
+Die Lektionen 3 bis 15 enden mit einer Musterlösung, die den vollständigen Stand der geänderten Dateien zeigt.
 
 ## Fehlerfälle
 
