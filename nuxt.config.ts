@@ -15,10 +15,17 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()]
   },
+  // Diese Seiten brauchen die Sitzung aus dem Link und werden deshalb nur im Browser gerendert.
+  routeRules: {
+    '/confirm': { ssr: false },
+    '/passwort-neu': { ssr: false }
+  },
   supabase: {
     // Keine Seite erzwingt einen Login; /profil schützt die Middleware "auth".
     redirect: false,
-    types: false
+    types: false,
+    // Die Anmeldung bleibt 30 Tage bestehen.
+    cookieOptions: { maxAge: 60 * 60 * 24 * 30, sameSite: 'lax', secure: true }
   },
   mdc: {
     highlight: {

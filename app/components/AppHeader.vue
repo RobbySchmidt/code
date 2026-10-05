@@ -1,12 +1,6 @@
 <script setup>
-const client = useSupabaseClient()
 const user = useSupabaseUser()
-
-async function logout() {
-  await client.auth.signOut()
-  user.value = null
-  await navigateTo('/')
-}
+const logout = useLogout()
 </script>
 
 <template>

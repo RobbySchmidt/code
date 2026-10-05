@@ -1,19 +1,13 @@
 <script setup>
 definePageMeta({ middleware: 'auth' })
 
-const client = useSupabaseClient()
 const user = useSupabaseUser()
+const logout = useLogout()
 const { data: lessons, error } = await useLessons()
 const { completedIds, completedAt } = useProgress()
 
 const percent = computed(() => percentComplete(lessons.value, completedIds.value))
 const counts = computed(() => countCompleted(lessons.value, completedIds.value))
-
-async function logout() {
-  await client.auth.signOut()
-  user.value = null
-  await navigateTo('/')
-}
 
 useSeoMeta({ title: 'Profil' })
 </script>

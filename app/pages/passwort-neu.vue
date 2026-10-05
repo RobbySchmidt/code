@@ -6,12 +6,11 @@ const route = useRoute()
 const pending = ref(false)
 const error = ref('')
 // Ohne Sitzung aus dem Reset-Link lässt sich kein Passwort setzen.
-const invalidLink = ref(Boolean(route.query.error))
+const invalidLink = ref(false)
 
 onMounted(() => {
-  setTimeout(() => {
-    if (!user.value) invalidLink.value = true
-  }, 5000)
+  // Die Seite läuft nur im Browser; die Sitzung aus dem Link ist beim Mounten schon geklärt.
+  if (route.query.error || window.location.hash.includes('error=') || !user.value) invalidLink.value = true
 })
 
 async function savePassword({ password }) {

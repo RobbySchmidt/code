@@ -24,6 +24,11 @@
     font-feature-settings: "calt" 0, "liga" 0, "ss03", "cv01", "cv10";
   }
 
+  button:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
+
   :focus-visible {
     outline: 2px solid var(--color-ink);
     outline-offset: 2px;

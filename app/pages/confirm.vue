@@ -2,18 +2,17 @@
 const user = useSupabaseUser()
 const route = useRoute()
 
-// Supabase hängt bei abgelaufenen Links ?error=… an die Adresse.
-const failed = ref(Boolean(route.query.error))
+// Supabase hängt bei abgelaufenen Links ?error=… an die Adresse oder den Hash.
+const failed = ref(false)
 
 watch(user, (current) => {
   if (current) navigateTo('/profil')
 }, { immediate: true })
 
 onMounted(() => {
-  // Wird der Link in einem anderen Browser geöffnet, entsteht keine Sitzung. Dann nicht endlos warten.
-  setTimeout(() => {
-    if (!user.value) failed.value = true
-  }, 5000)
+  // Die Seite läuft nur im Browser; die Sitzung aus dem Link ist beim Mounten schon geklärt.
+  // Ohne Nutzer (Link abgelaufen oder in einem anderen Browser geöffnet) gibt es keine Anmeldung.
+  if (route.query.error || window.location.hash.includes('error=') || !user.value) failed.value = true
 })
 
 useSeoMeta({ title: 'Konto bestätigen' })
