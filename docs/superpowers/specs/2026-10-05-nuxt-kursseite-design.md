@@ -17,7 +17,7 @@ Enthalten:
 - Konto mit E-Mail und Passwort, inklusive Passwort-Reset
 - Fortschritt pro Konto über den Button „Lektion abschließen“
 - Profilseite mit Fortschritt, „Kurs weitermachen“ und Passwort ändern
-- Der komplette Kursinhalt (13 Lektionen)
+- Der komplette Kursinhalt (16 Lektionen in fünf Blöcken: Start, HTML, CSS, JavaScript, Abschluss)
 - Platzhalterseiten für Impressum und Datenschutz
 
 Nicht enthalten:
@@ -42,8 +42,8 @@ Nicht enthalten:
 
 | Seite | Inhalt |
 |---|---|
-| `/` | Kurze Vorstellung des Kurses, darunter die Lektionsliste. Eingeloggt: Häkchen je Lektion, Fortschrittsbalken und „Kurs weitermachen“ (siehe „Kurs weitermachen“). |
-| `/profil` | Nur eingeloggt erreichbar, sonst Weiterleitung zu `/login`. Zeigt E-Mail-Adresse, Fortschrittsbalken, „Kurs weitermachen“, die Lektionsliste mit Häkchen und Abschlussdatum, ein Formular zum Ändern des Passworts und Logout. |
+| `/` | Kurze Vorstellung des Kurses, darunter die Lektionsliste, gegliedert nach Blöcken. Eingeloggt: Häkchen je Lektion, Fortschrittsbalken und „Kurs weitermachen“ (siehe „Kurs weitermachen“). |
+| `/profil` | Nur eingeloggt erreichbar, sonst Weiterleitung zu `/login`. Zeigt E-Mail-Adresse, Fortschrittsbalken für den ganzen Kurs, Fortschritt je Block („2 von 5“), „Kurs weitermachen“, die nach Blöcken gegliederte Lektionsliste mit Häkchen und Abschlussdatum, ein Formular zum Ändern des Passworts und Logout. |
 | `/kurs/[slug]` | Eine Lektion: gerenderter Markdown-Text, Codeblöcke mit Kopier-Button, aufklappbare Musterlösung, „Zurück“/„Weiter“, Button „Lektion abschließen“. Ausgeloggt steht statt des Buttons ein Hinweis mit Link zum Login. |
 | `/login` | Anmeldung mit E-Mail und Passwort |
 | `/registrieren` | Registrierung mit E-Mail und Passwort |
@@ -68,6 +68,47 @@ Lektionsseite auf großen Bildschirmen: links die Lektionsliste mit Häkchen, re
 
 `redirect` des Supabase-Moduls bleibt `false`: Keine Seite erzwingt einen Login. Lektionen sind ohne Konto lesbar.
 
+### Blöcke
+
+Jede Lektion gehört zu genau einem Block: Start, HTML, CSS, JavaScript oder Abschluss. Die Lektionsliste (Startseite, Seitenleiste, Profil) zeigt die Blöcke als getrennte Gruppen, jede mit Überschrift, Etikett und „x von y erledigt“. Auf der Lektionsseite steht das Etikett des Blocks über dem Titel.
+
+Die Blöcke werden über Gruppierung, Überschriften und Etiketten getrennt, nicht über eigene Farben je Block. Das folgt aus der Stilvorgabe, die genau eine Akzentfarbe erlaubt.
+
+## Gestaltung
+
+Stilreferenz ist das von Robby gelieferte Design-System (Auszug aus brex.com). Übernommen werden Farben, Typografie-Maße, Abstände, Radien und die Regeln; Logo, Markenname und Bildwelt von Brex werden nicht übernommen.
+
+### Token
+
+Die Token kommen als `@theme`-Block in `app/assets/css/main.css`.
+
+| Gruppe | Werte |
+|---|---|
+| Akzent | Ember `#ff5900` |
+| Text | Ink `#000000` (Überschriften, Hervorhebungen), Graphite `#60646c` (Fließtext), Pewter `#6f737b` (Hilfstexte), Steel `#8b8d98` (Platzhalter, Icons) |
+| Flächen | Paper `#ffffff` (Seite, Karten), Fog `#f3f3f7` (abgesetzte Bereiche, Eingabefelder) |
+| Linien | Mist `#b9bbc6` (1px-Rahmen, Trenner, deaktiviert) |
+| Dunkel | Abyss `#000710` (Fuß), Carbon `#15191e` (nur ganz oben auf der Seite) |
+| Radien | 12px für Buttons, Eingabefelder und Karten; 6px für Etiketten |
+| Abstände | 8px-Raster: 8, 16, 24, 32, 48, 72, 80; Abschnitte 48–80px, Karten-Innenabstand 24–32px |
+| Breite | Seite maximal 1200px, Fließtext maximal etwa 640px |
+
+### Schrift
+
+Inter (Google Fonts) in den Gewichten 400, 500 und 600 für alles, auch für Überschriften. Die Display-Schrift Flecha aus der Referenz ist eine kommerzielle Schrift und wird nicht verwendet.
+
+Laufweite negativ wie in der Referenz: −0,01em bis 24px, −0,02em bei 36px, −0,025em bei 48px, −0,03em bei 72px. Die Referenzdateien geben diese Werte teils in px an; maßgeblich sind die em-Werte aus der Beschreibung.
+
+### Regeln
+
+- Ember steht je Bereich nur für die eine Hauptaktion („Kurs weitermachen“, „Lektion abschließen“, Absenden von Formularen), dazu für den Fortschrittsbalken und Häkchen. Keine zweite Akzentfarbe.
+- Links im Fließtext sind Ink mit Unterstreichung, nicht Ember.
+- Keine Schatten für Karten; Abgrenzung über Paper auf Fog und 1px-Rahmen in Mist.
+- Fließtext linksbündig, nicht zentriert.
+- Der Fuß ist Abyss mit heller Schrift.
+- Codeblöcke in Lektionen stehen auf Fog mit 12px Radius und einem hellen Syntax-Theme.
+- Fehlermeldungen sind Ink auf Fog mit Icon; eine eigene Fehlerfarbe gibt es nicht.
+
 ## Bausteine
 
 | Baustein | Aufgabe | Hängt ab von |
@@ -75,7 +116,9 @@ Lektionsseite auf großen Bildschirmen: links die Lektionsliste mit Häkchen, re
 | `useLessons` (Composable) | Lädt die Liste der veröffentlichten Lektionen (ohne Text) und eine einzelne Lektion per Slug | Supabase-Client |
 | `useProgress` (Composable) | Lädt die abgeschlossenen Lektionen des eingeloggten Nutzers, schließt eine Lektion ab oder nimmt den Abschluss zurück | Supabase-Client, Nutzer |
 | `useProfile` (Composable) | Lädt die zuletzt geöffnete Lektion des eingeloggten Nutzers und speichert sie beim Öffnen einer Lektion | Supabase-Client, Nutzer |
-| `utils/progress.js` | Reine Funktionen: Prozentwert und Ziel von „Kurs weitermachen“ aus Lektionsliste, Menge der abgeschlossenen IDs und zuletzt geöffneter Lektion | nichts |
+| `utils/progress.js` | Reine Funktionen: Prozentwert, Fortschritt je Block und Ziel von „Kurs weitermachen“ aus Lektionsliste, Menge der abgeschlossenen IDs und zuletzt geöffneter Lektion | nichts |
+| `utils/sections.js` | Reihenfolge und Anzeigenamen der Blöcke; gruppiert eine Lektionsliste nach Block | nichts |
+| `SectionTag` | Etikett eines Blocks (6px Radius) | `utils/sections.js` |
 | `ResumeButton` | „Kurs starten“, „Kurs weitermachen“ oder „Kurs abgeschlossen“ | `useLessons`, `useProgress`, `useProfile`, `utils/progress.js` |
 | `PasswordForm` | Passwort ändern im Profil | Supabase-Auth |
 | `LessonList` | Lektionsliste mit Häkchen, für Startseite und Seitenleiste | `useLessons`, `useProgress` |
@@ -97,6 +140,7 @@ Lektionsseite auf großen Bildschirmen: links die Lektionsliste mit Häkchen, re
 | `title` | `text`, nicht leer | |
 | `summary` | `text`, nicht leer | Ein Satz für die Lektionsliste |
 | `position` | `integer`, eindeutig | Reihenfolge im Kurs |
+| `section` | `text`, nicht leer, nur `start`, `html`, `css`, `js`, `abschluss` | Block der Lektion |
 | `content` | `text`, nicht leer | Markdown |
 | `solution` | `text`, darf `null` sein | Markdown |
 | `published` | `boolean`, Standard `false` | |
@@ -143,19 +187,38 @@ RLS ist auf allen drei Tabellen aktiv.
 
 Die Todo-App des Tutorials: HTML im Template, JavaScript mit `<script setup>`, kein TypeScript, Tailwind fürs Styling, Todos im `localStorage`.
 
+Die App entsteht in drei Durchgängen: erst als HTML-Gerüst ohne Funktion, dann gestylt, dann mit JavaScript zum Leben erweckt.
+
+**Start**
+
 1. **Willkommen:** Was wir bauen, was man braucht, wie der Kurs funktioniert
 2. **Werkzeuge einrichten:** Node.js und VS Code installieren, das Terminal kennenlernen
 3. **Projekt anlegen:** Nuxt-Projekt erzeugen, Entwicklungsserver starten, Blick in die Ordner
+
+**HTML**
+
 4. **Die erste Seite:** `app.vue`, Template, HTML-Grundlagen
-5. **Tailwind einrichten:** Installation, erste Klassen für Abstände, Farben und Schrift
-6. **Daten anzeigen:** `<script setup>`, `ref`, Ausgabe mit `{{ }}`, Listen mit `v-for`
-7. **Todos hinzufügen:** Formular, `v-model`, die erste eigene Funktion
-8. **Todos abhaken:** Checkbox und zustandsabhängige Klassen
-9. **Todos löschen:** Button pro Eintrag, Filtern der Liste
-10. **Zähler und leere Liste:** `computed` und `v-if`
-11. **In Komponenten aufteilen:** `TodoItem` mit Props und Events
-12. **Speichern im Browser:** `localStorage`, dazu der Button „Alle löschen“, der Liste und Speicher leert
-13. **Geschafft:** Rückblick und Ideen zum Weitermachen
+5. **Das Gerüst der Todo-App:** Überschrift, Formular, Liste mit festen Beispiel-Todos, Buttons, alles noch ohne Funktion
+
+**CSS**
+
+6. **Tailwind einrichten:** Installation, erste Klassen für Abstände, Farben und Schrift
+7. **Die Todo-App stylen:** Layout, Karte, Formular und Listeneinträge
+8. **Feinschliff:** Hover- und Fokus-Zustände, Ansicht auf dem Handy
+
+**JavaScript**
+
+9. **Daten anzeigen:** `<script setup>`, `ref`, Ausgabe mit `{{ }}`, Listen mit `v-for` statt fester Einträge
+10. **Todos hinzufügen:** `v-model`, Formular absenden, die erste eigene Funktion
+11. **Todos abhaken:** Checkbox und zustandsabhängige Klassen
+12. **Todos löschen:** Button pro Eintrag, Filtern der Liste
+13. **Zähler und leere Liste:** `computed` und `v-if`
+14. **In Komponenten aufteilen:** `TodoItem` mit Props und Events
+15. **Speichern im Browser:** `localStorage`, dazu der Button „Alle löschen“, der Liste und Speicher leert
+
+**Abschluss**
+
+16. **Geschafft:** Rückblick und Ideen zum Weitermachen
 
 Ab Lektion 3 endet jede Lektion mit einer Musterlösung, die den vollständigen Stand der geänderten Dateien zeigt.
 
