@@ -5,7 +5,7 @@ export function countCompleted(lessons, completedIds) {
 
 export function percentComplete(lessons, completedIds) {
   const { done, total } = countCompleted(lessons, completedIds)
-  return total === 0 ? 0 : Math.floor((done / total) * 100)
+  return total === 0 ? 0 : Math.floor((done * 100) / total)
 }
 
 export function resumeTarget(lessons, completedIds, lastLessonId) {

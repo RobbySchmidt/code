@@ -33,6 +33,12 @@ describe('percentComplete', () => {
   it('übersteigt 100 nicht, wenn zurückgezogene Lektionen erledigt waren', () => {
     expect(percentComplete(lessons, new Set([10, 20, 30, 998, 999]))).toBe(100)
   })
+
+  it('rechnet ohne Gleitkomma-Rundungsfehler', () => {
+    const hundredLessons = Array.from({ length: 100 }, (_, i) => ({ id: i + 1, slug: `l${i + 1}`, section: 'test' }))
+    const completed = new Set(Array.from({ length: 29 }, (_, i) => i + 1))
+    expect(percentComplete(hundredLessons, completed)).toBe(29)
+  })
 })
 
 describe('resumeTarget', () => {
