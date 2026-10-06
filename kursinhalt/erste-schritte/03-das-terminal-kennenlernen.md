@@ -110,4 +110,4 @@ Manche Befehle laufen weiter, bis du sie stoppst. Dazu gehört später der **Ser
 - Du hast einen Ordner `projekte` angelegt und kannst hinein- und wieder herauswechseln.
 - Du weißt, dass du mit Strg+C einen laufenden Befehl beendest.
 
-Damit bist du bereit für den Kurs „Todo-App“. Darin baust du mit **Nuxt**, einem Werkzeug zum Bauen von Web-Apps, deine erste eigene Aufgabenliste.
+Damit bist du bereit für den Kurs „Todo-App“. Darin baust du mit Nuxt, dem Werkzeug aus der vorigen Lektion, deine erste eigene Aufgabenliste.

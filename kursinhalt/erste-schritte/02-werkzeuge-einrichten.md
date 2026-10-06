@@ -35,7 +35,7 @@ Du solltest jetzt ein Fenster mit einer Startseite sehen. Es ist normal, dass es
 
 ## Die Erweiterung „Vue (Official)“ installieren
 
-Eine **Erweiterung** ist ein Zusatz, der den Editor um eine Fähigkeit ergänzt. **Vue** ist der Baukasten für Webseiten, auf dem Nuxt aufbaut. Die Erweiterung „Vue (Official)“ bringt VS Code bei, die Dateien dieses Baukastens zu verstehen und farbig darzustellen.
+Eine **Erweiterung** ist ein Zusatz, der den Editor um eine Fähigkeit ergänzt. **Vue** ist der Baukasten für Webseiten, auf dem **Nuxt** aufbaut, das Werkzeug, mit dem du in diesen Kursen deine Apps baust. Die Erweiterung „Vue (Official)“ bringt VS Code bei, die Dateien dieses Baukastens zu verstehen und farbig darzustellen.
 
 1. Öffne in VS Code den Bereich für Erweiterungen. Du findest ihn in der Leiste am Rand des Fensters, das Symbol zeigt mehrere Quadrate.
 2. Tippe in das Suchfeld `Vue - Official` ein.

@@ -10,6 +10,14 @@ const props = defineProps({
 
 const copied = ref(false)
 
+// Ohne Dateinamen zeigt die Leiste die Sprache, bei Shells stattdessen „Terminal“.
+const TERMINAL_LANGUAGES = ['bash', 'sh', 'shell', 'powershell']
+const label = computed(() => {
+  if (props.filename) return props.filename
+  if (props.language && TERMINAL_LANGUAGES.includes(props.language.toLowerCase())) return 'Terminal'
+  return props.language || 'Code'
+})
+
 async function copy() {
   try {
     await navigator.clipboard.writeText(props.code)
@@ -26,7 +34,7 @@ async function copy() {
 <template>
   <div class="code-block">
     <div class="code-block-bar">
-      <span>{{ filename || language || 'Code' }}</span>
+      <span>{{ label }}</span>
       <button type="button" class="font-medium text-ink hover:underline" @click="copy">
         {{ copied ? 'Kopiert' : 'Kopieren' }}
       </button>

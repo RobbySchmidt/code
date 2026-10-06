@@ -26,7 +26,7 @@ Speichere. Unter „2 offen“ steht „Hallo aus JavaScript“. Doppelte geschw
 
 ## Wozu `ref`?
 
-Um die Anzeige kümmert sich **Vue**, ein Baustein, der in Nuxt steckt. Ein **Ref** ist eine Hülle um einen Wert, die Vue beobachtet: Ändert sich der Wert, zeichnet Vue die betroffenen Stellen der Seite neu. Du erzeugst die Hülle mit `ref` und schreibst den Startwert in die runden Klammern.
+Um die Anzeige kümmert sich **Vue**, der Baukasten, auf dem Nuxt aufbaut. Ein **Ref** ist eine Hülle um einen Wert, die Vue beobachtet: Ändert sich der Wert, zeichnet Vue die betroffenen Stellen der Seite neu. Du erzeugst die Hülle mit `ref` und schreibst den Startwert in die runden Klammern.
 
 Einen Import wie bei den Icons braucht `ref` nicht. Nuxt stellt es in jeder Vue-Datei von selbst bereit.
 

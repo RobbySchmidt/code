@@ -1,5 +1,14 @@
 -- Erzeugt von `yarn content:seed`. Nicht von Hand ändern.
--- Nur einmal einspielen: Das Skript überschreibt Änderungen, die später im Dashboard gemacht wurden.
+--
+-- Diese Datei legt die unten genannten Kurse und Lektionen an oder aktualisiert sie.
+-- Beim Einspielen werden Titel, Kurzbeschreibung, Text, Musterlösung, Position und
+-- Veröffentlichungsstatus dieser Kurse und Lektionen mit der Fassung aus dem Repository
+-- überschrieben. Änderungen, die im Supabase-Dashboard gemacht wurden, gehen dabei verloren.
+-- Mit `--prune` erzeugt, werden außerdem Lektionen gelöscht, die im Repository fehlen,
+-- samt dem Fortschritt der Lernenden dazu. Ohne `--prune` wird nichts gelöscht.
+-- Alles läuft in einer Transaktion: Bei einem Fehler bleibt die Datenbank unverändert.
+
+begin;
 
 update public.courses set position = position + 1000 where slug in ('erste-schritte', 'todo-app');
 
@@ -20,16 +29,13 @@ update public.courses
 set recommended_course_id = (select id from public.courses where slug = 'erste-schritte')
 where slug = 'todo-app';
 
-delete from public.lessons
-where course_id = (select id from public.courses where slug = 'erste-schritte')
-  and slug not in ('willkommen', 'werkzeuge-einrichten', 'das-terminal-kennenlernen');
+-- Hinweis (erste-schritte): Lektionen, die im Repository fehlen, bleiben in der Datenbank. Zum Löschen `yarn content:seed --prune` verwenden.
 
-delete from public.lessons
-where course_id = (select id from public.courses where slug = 'todo-app')
-  and slug not in ('was-wir-bauen', 'projekt-anlegen', 'die-erste-seite', 'das-geruest-der-todo-app', 'tailwind-einrichten', 'die-app-stylen', 'icons-mit-lucide', 'feinschliff', 'daten-anzeigen', 'aufgaben-hinzufuegen', 'aufgaben-abhaken', 'aufgaben-loeschen', 'zaehler-und-leere-liste', 'in-komponenten-aufteilen', 'speichern-im-browser', 'geschafft');
+-- Hinweis (todo-app): Lektionen, die im Repository fehlen, bleiben in der Datenbank. Zum Löschen `yarn content:seed --prune` verwenden.
 
 update public.lessons set position = position + 1000
-where course_id = (select id from public.courses where slug = 'erste-schritte');
+where course_id = (select id from public.courses where slug = 'erste-schritte')
+  and slug in ('willkommen', 'werkzeuge-einrichten', 'das-terminal-kennenlernen');
 
 insert into public.lessons (course_id, slug, title, summary, position, section, content, solution, published) values
   (
@@ -111,7 +117,7 @@ Du solltest jetzt ein Fenster mit einer Startseite sehen. Es ist normal, dass es
 
 ## Die Erweiterung „Vue (Official)“ installieren
 
-Eine **Erweiterung** ist ein Zusatz, der den Editor um eine Fähigkeit ergänzt. **Vue** ist der Baukasten für Webseiten, auf dem Nuxt aufbaut. Die Erweiterung „Vue (Official)“ bringt VS Code bei, die Dateien dieses Baukastens zu verstehen und farbig darzustellen.
+Eine **Erweiterung** ist ein Zusatz, der den Editor um eine Fähigkeit ergänzt. **Vue** ist der Baukasten für Webseiten, auf dem **Nuxt** aufbaut, das Werkzeug, mit dem du in diesen Kursen deine Apps baust. Die Erweiterung „Vue (Official)“ bringt VS Code bei, die Dateien dieses Baukastens zu verstehen und farbig darzustellen.
 
 1. Öffne in VS Code den Bereich für Erweiterungen. Du findest ihn in der Leiste am Rand des Fensters, das Symbol zeigt mehrere Quadrate.
 2. Tippe in das Suchfeld `Vue - Official` ein.
@@ -238,7 +244,7 @@ Manche Befehle laufen weiter, bis du sie stoppst. Dazu gehört später der **Ser
 - Du hast einen Ordner `projekte` angelegt und kannst hinein- und wieder herauswechseln.
 - Du weißt, dass du mit Strg+C einen laufenden Befehl beendest.
 
-Damit bist du bereit für den Kurs „Todo-App“. Darin baust du mit **Nuxt**, einem Werkzeug zum Bauen von Web-Apps, deine erste eigene Aufgabenliste.$lesson$,
+Damit bist du bereit für den Kurs „Todo-App“. Darin baust du mit Nuxt, dem Werkzeug aus der vorigen Lektion, deine erste eigene Aufgabenliste.$lesson$,
     null,
     true
   )
@@ -252,7 +258,8 @@ on conflict (course_id, slug) do update set
   published = excluded.published;
 
 update public.lessons set position = position + 1000
-where course_id = (select id from public.courses where slug = 'todo-app');
+where course_id = (select id from public.courses where slug = 'todo-app')
+  and slug in ('was-wir-bauen', 'projekt-anlegen', 'die-erste-seite', 'das-geruest-der-todo-app', 'tailwind-einrichten', 'die-app-stylen', 'icons-mit-lucide', 'feinschliff', 'daten-anzeigen', 'aufgaben-hinzufuegen', 'aufgaben-abhaken', 'aufgaben-loeschen', 'zaehler-und-leere-liste', 'in-komponenten-aufteilen', 'speichern-im-browser', 'geschafft');
 
 insert into public.lessons (course_id, slug, title, summary, position, section, content, solution, published) values
   (
@@ -313,6 +320,8 @@ Wenn alles eingerichtet ist, legst du in der nächsten Lektion dein Projekt an.$
 
 Öffne ein Terminal und wechsle in den Ordner `projekte`, den du im Kurs „Erste Schritte“ angelegt hast:
 
+Gibt es den Ordner noch nicht, lege ihn zuerst mit `mkdir projekte` an.
+
 ```bash
 cd projekte
 ```
@@ -323,11 +332,11 @@ Starte jetzt den Helfer. Das letzte Wort ist der Name deines Projektordners:
 npm create nuxt@latest todo-app
 ```
 
-Der Helfer stellt dir nacheinander ein paar Fragen auf Englisch. Eine Auswahl triffst du mit den Pfeiltasten und bestätigst sie mit der Eingabetaste. Der Wortlaut kann bei dir etwas anders sein, weil der Helfer weiterentwickelt wird. Halte dich dann an ihren Sinn.
+Der Helfer stellt dir nacheinander ein paar Fragen auf Englisch. Eine Auswahl triffst du mit den Pfeiltasten und bestätigst sie mit der Eingabetaste. Der Wortlaut kann abweichen, halte dich dann an den Sinn.
 
 1. Möglicherweise fragt zuerst npm, ob es den Helfer `create-nuxt` herunterladen darf. Bestätige mit der Eingabetaste.
 2. **Welche Vorlage?** Wähle `minimal`, die kleinste Vorlage. Sie ist als empfohlen markiert.
-3. **Welcher Paketmanager?** Wähle `npm`. Ein **Paketmanager** ist ein Programm, das Bausteine herunterlädt, und npm hast du schon.
+3. **Welcher Paketmanager?** Wähle `npm`. Ein **Paketmanager** ist ein Programm, das Pakete herunterlädt. Ein **Paket** ist ein fertiger Baustein aus Code, den andere geschrieben haben und den npm für dich herunterlädt. npm hast du schon.
 4. Danach lädt der Helfer Nuxt herunter. Das kann einige Minuten dauern.
 5. **Git-Repository anlegen?** Wähle „No“. **Git** ist ein Werkzeug, das Änderungen an Dateien festhält. In diesem Kurs brauchst du es nicht.
 6. **Module ansehen und installieren?** Wähle „No“.
@@ -386,7 +395,7 @@ Die Zeile mit `NuxtWelcome` erzeugt die Willkommensseite. In der nächsten Lekti
 
 Vor einer Pause stoppst du den Server mit Strg+C. Beim nächsten Mal öffnest du in VS Code das Menü „Terminal“ und wählst „New Terminal“, auf Deutsch „Neues Terminal“. Dieses Terminal steht sofort im Projektordner, und du startest dort wieder `npm run dev`.
 
-### Wenn es nicht klappt
+## Wenn es nicht klappt
 
 - **Der Befehl `npm` wird nicht gefunden:** Node.js fehlt. Schau in den Kurs „Erste Schritte“.
 - **`npm run dev` meldet, dass ein Skript oder eine `package.json` fehlt:** Du bist im falschen Ordner. Wechsle mit `cd todo-app` in dein Projekt.
@@ -1189,7 +1198,7 @@ Speichere. Unter „2 offen“ steht „Hallo aus JavaScript“. Doppelte geschw
 
 ## Wozu `ref`?
 
-Um die Anzeige kümmert sich **Vue**, ein Baustein, der in Nuxt steckt. Ein **Ref** ist eine Hülle um einen Wert, die Vue beobachtet: Ändert sich der Wert, zeichnet Vue die betroffenen Stellen der Seite neu. Du erzeugst die Hülle mit `ref` und schreibst den Startwert in die runden Klammern.
+Um die Anzeige kümmert sich **Vue**, der Baukasten, auf dem Nuxt aufbaut. Ein **Ref** ist eine Hülle um einen Wert, die Vue beobachtet: Ändert sich der Wert, zeichnet Vue die betroffenen Stellen der Seite neu. Du erzeugst die Hülle mit `ref` und schreibst den Startwert in die runden Klammern.
 
 Einen Import wie bei den Icons braucht `ref` nicht. Nuxt stellt es in jeder Vue-Datei von selbst bereit.
 
@@ -1548,7 +1557,7 @@ const book = books.value.find(book => book.title === 'Krabat')
 book.title = 'Krabat, neue Ausgabe'
 ```
 
-In den Klammern von `find` steht eine Funktion in Kurzform. Vor dem Pfeil `=>` steht der Name für den Eintrag, der gerade geprüft wird, dahinter die Bedingung. `book` ist danach das zweite Objekt, und die letzte Zeile gibt ihm einen neuen Titel. `book` ist ein gewöhnliches Objekt und kein Ref, darum steht dort kein `.value`. Es ist auch keine Kopie: Die Änderung gilt in der Liste.
+In den Klammern von `find` steht eine Funktion in Kurzform. Vor dem Pfeil `=>` steht der Name für den Eintrag, der gerade geprüft wird, dahinter die Bedingung. `book` ist danach das zweite Objekt, und die letzte Zeile gibt ihm einen neuen Titel. `book` ist ein gewöhnliches Objekt und kein Ref, darum steht dort kein `.value`. Es ist auch keine Kopie: Die Änderung gilt in der Liste. Das `book` vor dem Pfeil und das `book` links vom Gleichheitszeichen sind zwei verschiedene Variablen mit zufällig gleichem Namen. In der Musterlösung gilt das auch für `task`.
 
 Ein Ausrufezeichen vor einem Wahrheitswert dreht ihn um. Aus `true` wird `false` und umgekehrt:
 
@@ -2232,7 +2241,7 @@ Lade die Seite neu. Trotzdem erscheinen wieder die Beispielaufgaben, denn gespei
 
 ## Laden, sobald die Seite im Browser ist
 
-Naheliegend wäre, den Speicher gleich oben im Script-Teil auszulesen. Das scheitert. Nuxt baut die Seite zuerst auf dem Server zusammen, also in dem Programm, das in deinem Terminal läuft, und schickt sie fertig an den Browser. Der Server hat keinen Zugriff auf den Speicher deines Browsers, und die Seite bräche mit einem Fehler ab.
+Naheliegend wäre, den Speicher gleich oben im Script-Teil auszulesen. Das scheitert. Nuxt baut die Seite zuerst auf dem Server zusammen, also in dem Programm, das in deinem Terminal läuft, und schickt sie fertig an den Browser. Der Server hat keinen Zugriff auf den Speicher deines Browsers. Liest du ihn dort aus, schlägt das fehl oder liefert nichts Brauchbares.
 
 `onMounted` löst das. Es bekommt eine Funktion, und die läuft nur im Browser, sobald die Seite dort angezeigt wird. Ein Beispiel, das nicht in die App gehört:
 
@@ -2547,3 +2556,5 @@ on conflict (course_id, slug) do update set
   content = excluded.content,
   solution = excluded.solution,
   published = excluded.published;
+
+commit;

@@ -42,7 +42,7 @@ Lade die Seite neu. Trotzdem erscheinen wieder die Beispielaufgaben, denn gespei
 
 ## Laden, sobald die Seite im Browser ist
 
-Naheliegend wäre, den Speicher gleich oben im Script-Teil auszulesen. Das scheitert. Nuxt baut die Seite zuerst auf dem Server zusammen, also in dem Programm, das in deinem Terminal läuft, und schickt sie fertig an den Browser. Der Server hat keinen Zugriff auf den Speicher deines Browsers, und die Seite bräche mit einem Fehler ab.
+Naheliegend wäre, den Speicher gleich oben im Script-Teil auszulesen. Das scheitert. Nuxt baut die Seite zuerst auf dem Server zusammen, also in dem Programm, das in deinem Terminal läuft, und schickt sie fertig an den Browser. Der Server hat keinen Zugriff auf den Speicher deines Browsers. Liest du ihn dort aus, schlägt das fehl oder liefert nichts Brauchbares.
 
 `onMounted` löst das. Es bekommt eine Funktion, und die läuft nur im Browser, sobald die Seite dort angezeigt wird. Ein Beispiel, das nicht in die App gehört:
 

@@ -10,6 +10,8 @@ Ein **Projekt** ist ein Ordner, in dem alle Dateien deiner App liegen. Du musst 
 
 Öffne ein Terminal und wechsle in den Ordner `projekte`, den du im Kurs „Erste Schritte“ angelegt hast:
 
+Gibt es den Ordner noch nicht, lege ihn zuerst mit `mkdir projekte` an.
+
 ```bash
 cd projekte
 ```
@@ -20,11 +22,11 @@ Starte jetzt den Helfer. Das letzte Wort ist der Name deines Projektordners:
 npm create nuxt@latest todo-app
 ```
 
-Der Helfer stellt dir nacheinander ein paar Fragen auf Englisch. Eine Auswahl triffst du mit den Pfeiltasten und bestätigst sie mit der Eingabetaste. Der Wortlaut kann bei dir etwas anders sein, weil der Helfer weiterentwickelt wird. Halte dich dann an ihren Sinn.
+Der Helfer stellt dir nacheinander ein paar Fragen auf Englisch. Eine Auswahl triffst du mit den Pfeiltasten und bestätigst sie mit der Eingabetaste. Der Wortlaut kann abweichen, halte dich dann an den Sinn.
 
 1. Möglicherweise fragt zuerst npm, ob es den Helfer `create-nuxt` herunterladen darf. Bestätige mit der Eingabetaste.
 2. **Welche Vorlage?** Wähle `minimal`, die kleinste Vorlage. Sie ist als empfohlen markiert.
-3. **Welcher Paketmanager?** Wähle `npm`. Ein **Paketmanager** ist ein Programm, das Bausteine herunterlädt, und npm hast du schon.
+3. **Welcher Paketmanager?** Wähle `npm`. Ein **Paketmanager** ist ein Programm, das Pakete herunterlädt. Ein **Paket** ist ein fertiger Baustein aus Code, den andere geschrieben haben und den npm für dich herunterlädt. npm hast du schon.
 4. Danach lädt der Helfer Nuxt herunter. Das kann einige Minuten dauern.
 5. **Git-Repository anlegen?** Wähle „No“. **Git** ist ein Werkzeug, das Änderungen an Dateien festhält. In diesem Kurs brauchst du es nicht.
 6. **Module ansehen und installieren?** Wähle „No“.
@@ -83,7 +85,7 @@ Die Zeile mit `NuxtWelcome` erzeugt die Willkommensseite. In der nächsten Lekti
 
 Vor einer Pause stoppst du den Server mit Strg+C. Beim nächsten Mal öffnest du in VS Code das Menü „Terminal“ und wählst „New Terminal“, auf Deutsch „Neues Terminal“. Dieses Terminal steht sofort im Projektordner, und du startest dort wieder `npm run dev`.
 
-### Wenn es nicht klappt
+## Wenn es nicht klappt
 
 - **Der Befehl `npm` wird nicht gefunden:** Node.js fehlt. Schau in den Kurs „Erste Schritte“.
 - **`npm run dev` meldet, dass ein Skript oder eine `package.json` fehlt:** Du bist im falschen Ordner. Wechsle mit `cd todo-app` in dein Projekt.

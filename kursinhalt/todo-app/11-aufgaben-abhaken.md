@@ -63,7 +63,7 @@ const book = books.value.find(book => book.title === 'Krabat')
 book.title = 'Krabat, neue Ausgabe'
 ```
 
-In den Klammern von `find` steht eine Funktion in Kurzform. Vor dem Pfeil `=>` steht der Name für den Eintrag, der gerade geprüft wird, dahinter die Bedingung. `book` ist danach das zweite Objekt, und die letzte Zeile gibt ihm einen neuen Titel. `book` ist ein gewöhnliches Objekt und kein Ref, darum steht dort kein `.value`. Es ist auch keine Kopie: Die Änderung gilt in der Liste.
+In den Klammern von `find` steht eine Funktion in Kurzform. Vor dem Pfeil `=>` steht der Name für den Eintrag, der gerade geprüft wird, dahinter die Bedingung. `book` ist danach das zweite Objekt, und die letzte Zeile gibt ihm einen neuen Titel. `book` ist ein gewöhnliches Objekt und kein Ref, darum steht dort kein `.value`. Es ist auch keine Kopie: Die Änderung gilt in der Liste. Das `book` vor dem Pfeil und das `book` links vom Gleichheitszeichen sind zwei verschiedene Variablen mit zufällig gleichem Namen. In der Musterlösung gilt das auch für `task`.
 
 Ein Ausrufezeichen vor einem Wahrheitswert dreht ihn um. Aus `true` wird `false` und umgekehrt:
 

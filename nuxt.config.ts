@@ -31,7 +31,7 @@ export default defineNuxtConfig({
   mdc: {
     highlight: {
       theme: 'github-light',
-      langs: ['vue', 'html', 'css', 'js', 'json', 'bash']
+      langs: ['vue', 'html', 'css', 'js', 'ts', 'json', 'bash', 'powershell']
     }
   }
 })
