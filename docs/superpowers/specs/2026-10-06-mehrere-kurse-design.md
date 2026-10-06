@@ -36,6 +36,10 @@ Nicht enthalten:
 
 Ein Kurs gilt als begonnen, wenn mindestens eine seiner Lektionen abgeschlossen oder geöffnet wurde.
 
+### Kopfzeile
+
+Die Kopfzeile bleibt beim Scrollen oben stehen. Abweichend von der Regel „Ember nur für die Hauptaktion“ gilt für die Kopfzeile: Menü-Links werden bei Hover und auf der aktiven Seite Ember, ohne Unterstreichung, und „Abmelden“ ist ein Ember-gefüllter Button wie „Konto erstellen“. „Kurse“ ist auch auf Kurs- und Lektionsseiten als aktiv markiert. Beim Seitenwechsel blendet die alte Seite kurz aus und die neue ein; bei reduzierter Bewegung entfällt der Effekt.
+
 ### Kurs weitermachen
 
 Die Regeln gelten unverändert, aber je Kurs und nur mit den Lektionen dieses Kurses:
