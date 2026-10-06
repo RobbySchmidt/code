@@ -6,7 +6,7 @@ section: start
 
 Schön, dass du da bist. Diese Kurse sind für Menschen, die noch nie programmiert haben. Du brauchst kein Vorwissen, nur Neugier und etwas Geduld.
 
-Du lernst hier nicht nur zu lesen, sondern vor allem zu machen. Am Ende steht eine eigene kleine Web-App, die du selbst gebaut hast.
+Du lernst hier nicht nur zu lesen, sondern vor allem zu machen. Am Ende steht eine eigene kleine **Web-App**, also ein Programm, das im Browser läuft wie eine Webseite und das du selbst gebaut hast.
 
 ## Du arbeitest auf deinem eigenen Rechner
 
@@ -42,8 +42,4 @@ Alle Kurse findest du in der Übersicht unter `/kurse`. Dort wählst du einen Ku
 
 Mehr nicht. Alles Weitere richtest du in der nächsten Lektion ein.
 
-## Das solltest du jetzt haben
-
-- Du weißt, wie eine Lektion aufgebaut ist.
-- Du weißt, wofür der Knopf „Lektion abschließen“ da ist.
-- Optional: ein Konto, das deinen Fortschritt speichert.
+Jetzt weißt du, wie die Kurse funktionieren. Weiter geht es mit der nächsten Lektion.

@@ -8,7 +8,7 @@ Zum Programmieren brauchst du zwei Werkzeuge. Du installierst beide auf deinem R
 
 ## Node.js installieren
 
-**Node.js** ist ein Programm, das JavaScript-Code direkt auf deinem Rechner ausführen kann. Die Werkzeuge, mit denen du später deine App baust, laufen darauf. Mit Node.js kommt außerdem **npm** auf deinen Rechner, ein Helfer, der Programmbausteine für dich herunterlädt.
+**Node.js** ist ein Programm, das Code in der Programmiersprache **JavaScript** direkt auf deinem Rechner ausführen kann. Die Werkzeuge, mit denen du später deine App baust, laufen darauf. Mit Node.js kommt außerdem **npm** auf deinen Rechner, ein Helfer, der Programmbausteine für dich herunterlädt.
 
 So gehst du vor:
 
@@ -27,8 +27,9 @@ Wir benutzen dafür **Visual Studio Code**, kurz VS Code:
 
 1. Öffne die Seite `https://code.visualstudio.com`.
 2. Lade die Version für dein Betriebssystem herunter, also Windows oder macOS.
-3. Starte die heruntergeladene Datei beziehungsweise öffne sie auf dem Mac und folge den Anweisungen. Auch hier sind die vorgeschlagenen Einstellungen in Ordnung.
-4. Starte VS Code.
+3. Unter Windows startest du die heruntergeladene Datei und folgst dem Installationsprogramm. Auch hier sind die vorgeschlagenen Einstellungen in Ordnung.
+4. Auf dem Mac ist der Download meist ein Archiv, das die App enthält. Öffne es und ziehe die App VS Code in den Ordner „Programme“.
+5. Starte VS Code. Unter Windows findest du es im Startmenü, auf dem Mac im Ordner „Programme“ oder im Launchpad.
 
 Du solltest jetzt ein Fenster mit einer Startseite sehen. Es ist normal, dass es noch leer wirkt.
 
