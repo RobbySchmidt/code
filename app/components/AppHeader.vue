@@ -1,6 +1,10 @@
 <script setup>
 const user = useSupabaseUser()
 const logout = useLogout()
+const route = useRoute()
+
+// Kurs- und Lektionsseiten sind Geschwister von /kurse, active-class greift dort nicht.
+const inCourses = computed(() => route.path === '/kurse' || route.path.startsWith('/kurse/'))
 </script>
 
 <template>
@@ -10,7 +14,7 @@ const logout = useLogout()
         Nuxt für Einsteiger
       </NuxtLink>
       <nav class="flex items-center gap-4 text-sm font-medium text-ink" aria-label="Hauptmenü">
-        <NuxtLink to="/kurse" class="transition-colors hover:text-ember" active-class="text-ember">Kurse</NuxtLink>
+        <NuxtLink to="/kurse" class="transition-colors hover:text-ember" :class="{ 'text-ember': inCourses }">Kurse</NuxtLink>
         <template v-if="user">
           <NuxtLink to="/profil" class="transition-colors hover:text-ember" active-class="text-ember">Profil</NuxtLink>
           <button type="button" class="btn-primary" @click="logout">Abmelden</button>

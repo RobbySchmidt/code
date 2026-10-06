@@ -3,14 +3,16 @@ definePageMeta({ middleware: 'auth' })
 
 const user = useSupabaseUser()
 const logout = useLogout()
-const { data: courses } = await useCourses()
-const { data: lessons } = await useLessons()
+const { data: courses, error: coursesError } = await useCourses()
+const { data: lessons, error: lessonsError } = await useLessons()
 const { completedIds } = useProgress()
 const { lastLessonByCourse } = useCourseState()
 
 // Begonnen ist ein Kurs, sobald eine seiner Lektionen erledigt oder geöffnet wurde.
 const started = computed(() => courseOverview(courses.value, lessons.value, completedIds.value)
   .filter(item => item.done > 0 || lastLessonByCourse.value[item.course.id] != null))
+
+const failed = computed(() => Boolean(coursesError.value || lessonsError.value))
 
 useSeoMeta({ title: 'Profil' })
 </script>
@@ -25,7 +27,8 @@ useSeoMeta({ title: 'Profil' })
     <section class="bg-fog">
       <div class="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-20">
         <h2 class="text-2xl font-medium text-ink">Deine Kurse</h2>
-        <div v-if="started.length === 0" class="mt-8">
+        <p v-if="failed" class="notice mt-8 max-w-[640px] bg-paper" role="alert">Deine Kurse konnten gerade nicht geladen werden. Lade die Seite bitte neu.</p>
+        <div v-else-if="started.length === 0" class="mt-8">
           <p class="max-w-[640px]">Du hast noch keinen Kurs begonnen.</p>
           <NuxtLink to="/kurse" class="btn-primary mt-6">Kurse ansehen</NuxtLink>
         </div>

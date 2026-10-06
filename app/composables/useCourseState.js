@@ -6,7 +6,7 @@ export function useCourseState() {
     if (!user.value) return []
     const { data, error } = await client.from('course_state').select('course_id, last_lesson_id')
     return error ? [] : data
-  }, { watch: [() => user.value?.sub], default: () => [] })
+  }, { watch: [() => user.value?.sub], default: () => [], dedupe: 'defer' })
 
   const rows = state.data
   const lastLessonByCourse = computed(() => Object.fromEntries(rows.value.map(row => [row.course_id, row.last_lesson_id])))

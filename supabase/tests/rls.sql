@@ -120,6 +120,13 @@ begin
   get diagnostics n = row_count;
   assert n = 1, 'A konnte den eigenen Kursstand nicht ändern';
 
+  begin
+    delete from public.course_state where user_id = user_a;
+    get diagnostics n = row_count;
+    assert n = 0, 'A konnte den eigenen Kursstand löschen';
+  exception when insufficient_privilege then null;
+  end;
+
   delete from public.lesson_progress where user_id = user_a;
   get diagnostics n = row_count;
   assert n = 1, 'A konnte den eigenen Fortschritt nicht löschen';

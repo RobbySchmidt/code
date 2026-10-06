@@ -6,7 +6,7 @@ export function useProgress() {
     if (!user.value) return []
     const { data, error } = await client.from('lesson_progress').select('lesson_id, completed_at')
     return error ? [] : data
-  }, { watch: [() => user.value?.sub], default: () => [] })
+  }, { watch: [() => user.value?.sub], default: () => [], dedupe: 'defer' })
 
   const completedIds = computed(() => new Set(rows.value.map(row => row.lesson_id)))
   const completedAt = computed(() => Object.fromEntries(rows.value.map(row => [row.lesson_id, row.completed_at])))
