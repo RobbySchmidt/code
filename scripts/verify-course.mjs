@@ -51,15 +51,12 @@ for (const signal of ['SIGINT', 'SIGTERM']) {
 function run(command, args, options = {}) {
   return new Promise((resolve) => {
     // Mit shell: true wird der Befehl als eine Zeichenkette übergeben (die Argumente sind fest im Skript).
-    const child = options.shell ? spawn([command, ...args].join(' '), {
+    const shell = options.shell ?? false
+    const child = spawn(shell ? [command, ...args].join(' ') : command, shell ? [] : args, {
       cwd: options.cwd,
       env: { ...process.env, NUXT_TELEMETRY_DISABLED: '1', ...options.env },
-      shell: true,
-      windowsHide: true
-    }) : spawn(command, args, {
-      cwd: options.cwd,
-      env: { ...process.env, NUXT_TELEMETRY_DISABLED: '1', ...options.env },
-      shell: options.shell ?? false,
+      shell,
+      stdio: ['ignore', 'pipe', 'pipe'],
       windowsHide: true
     })
     children.add(child)
@@ -167,6 +164,7 @@ async function checkServer(projectDir) {
   const server = spawn(process.execPath, ['.output/server/index.mjs'], {
     cwd: projectDir,
     env: { ...process.env, PORT: String(port), HOST: '127.0.0.1', NITRO_PORT: String(port), NITRO_HOST: '127.0.0.1' },
+    stdio: ['ignore', 'pipe', 'pipe'],
     windowsHide: true
   })
   children.add(server)

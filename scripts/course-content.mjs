@@ -22,17 +22,45 @@ function readHead(fileName, lines) {
   return { head, end }
 }
 
+// Verfolgt Codezäune nach CommonMark: Backtick- oder Tilde-Zaun mit mindestens drei
+// Zeichen, bis zu drei Leerzeichen Einrückung; geschlossen wird nur von einem Zaun
+// derselben Art, der mindestens so lang ist und danach nur Leerraum hat.
+const FENCE_OPEN = /^ {0,3}(`{3,}|~{3,})(.*)$/
+const FENCE_CLOSE = /^ {0,3}(`{3,}|~{3,})[ 	]*$/
+
+function createFenceTracker() {
+  let open = null
+  // Liefert 'open' (Eröffnungszeile), 'close' (Schlusszeile), 'inside' oder 'outside'.
+  return function step(line) {
+    if (open) {
+      const match = line.match(FENCE_CLOSE)
+      if (match && match[1][0] === open.char && match[1].length >= open.length) {
+        const info = open.info
+        open = null
+        return { state: 'close', info }
+      }
+      return { state: 'inside', info: open.info }
+    }
+    const match = line.match(FENCE_OPEN)
+    if (match && !(match[1][0] === '`' && match[2].includes('`'))) {
+      open = { char: match[1][0], length: match[1].length, info: match[2].trim() }
+      return { state: 'open', info: open.info }
+    }
+    return { state: 'outside', info: '' }
+  }
+}
+
 // Zeilennummern zählen ab 1 (erste Zeile der Datei = 1).
 function checkBody(fileName, lines, firstIndex) {
+  const step = createFenceTracker()
   let inCode = false
   lines.forEach((line, i) => {
     const lineNo = firstIndex + i + 1
-    if (line.startsWith('```')) {
-      inCode = !inCode
-      return
-    }
-    if (inCode) return
-    if (line.includes('$lesson$')) throw fail(fileName, 'Die Zeichenfolge $lesson$ darf im Text nicht vorkommen.', lineNo)
+    // Gilt überall, auch in Codeblöcken: Der SQL-Text steht zwischen $lesson$ ... $lesson$.
+    if (line.includes('$lesson')) throw fail(fileName, 'Die Zeichenfolge $lesson$ (auch als $lesson am Zeilenende) darf nirgends vorkommen.', lineNo)
+    const { state } = step(line)
+    inCode = state === 'open' || state === 'inside'
+    if (state !== 'outside') return
     const prose = line.replace(/`[^`]*`/g, '')
     if (prose.includes('{{')) throw fail(fileName, 'Doppelte geschweifte Klammern gehören in Code-Auszeichnung (Backticks).', lineNo)
     if (COMMAND_START.test(prose)) throw fail(fileName, 'Ein Wort mit führendem : oder @ gehört in Code-Auszeichnung (Backticks).', lineNo)
@@ -55,7 +83,7 @@ export function parseLesson(fileName, text) {
   const bodyLines = lines.slice(end + 1)
   checkBody(fileName, bodyLines, end + 1)
 
-  const marker = bodyLines.indexOf(SOLUTION_MARKER)
+  const marker = bodyLines.findIndex(line => line.trim() === SOLUTION_MARKER)
   const content = (marker === -1 ? bodyLines : bodyLines.slice(0, marker)).join('\n').trim()
   const solution = marker === -1 ? '' : bodyLines.slice(marker + 1).join('\n').trim()
   if (content === '') throw fail(fileName, 'Die Lektion hat keinen Text.')
@@ -73,31 +101,25 @@ export function parseLesson(fileName, text) {
 
 export function extractFiles(markdown) {
   const lines = markdown.replace(/\r\n/g, '\n').split('\n')
+  const step = createFenceTracker()
   const files = []
   let current = null
-  let skipping = false
   for (const line of lines) {
-    if (current || skipping) {
-      if (line.startsWith('```')) {
-        if (current) files.push(current)
-        current = null
-        skipping = false
-      } else if (current) {
-        current.code += `${line}\n`
+    const { state, info } = step(line)
+    if (state === 'open') {
+      const match = info.match(/^\S*\s+\[([^\]]+)\]$/)
+      if (!match) continue
+      const path = match[1].trim()
+      if (path.split(/[\\/]/).includes('..') || /^[\\/]/.test(path) || /^[A-Za-z]:/.test(path)) {
+        throw new Error(`Ungültiger Dateipfad "${path}": Pfade müssen im Projekt bleiben.`)
       }
-      continue
+      current = { path, code: '' }
+    } else if (state === 'inside') {
+      if (current) current.code += `${line}\n`
+    } else if (state === 'close' && current) {
+      files.push(current)
+      current = null
     }
-    if (!line.startsWith('```')) continue
-    const match = line.match(/^```\S*\s+\[([^\]]+)\]\s*$/)
-    if (!match) {
-      skipping = true
-      continue
-    }
-    const path = match[1].trim()
-    if (path.split(/[\\/]/).includes('..') || /^[\\/]/.test(path) || /^[A-Za-z]:/.test(path)) {
-      throw new Error(`Ungültiger Dateipfad "${path}": Pfade müssen im Projekt bleiben.`)
-    }
-    current = { path, code: '' }
   }
   return files
 }
@@ -106,6 +128,14 @@ const q = value => `'${String(value).replaceAll("'", "''")}'`
 const courseId = slug => `(select id from public.courses where slug = ${q(slug)})`
 
 function validate(courses) {
+  for (const course of courses) {
+    if (typeof course.slug !== 'string' || !/^[a-z0-9-]+$/.test(course.slug)) {
+      throw new Error(`Kurs "${course.slug}": Der Adressteil darf nur Kleinbuchstaben, Ziffern und Bindestriche enthalten.`)
+    }
+    if (!Number.isInteger(course.position)) {
+      throw new Error(`Kurs "${course.slug}": Die Position muss eine ganze Zahl sein.`)
+    }
+  }
   const slugs = new Set()
   const positions = new Set()
   for (const course of courses) {
@@ -135,6 +165,9 @@ export function buildSeedSql(courses) {
     '-- Erzeugt von `yarn content:seed`. Nicht von Hand ändern.\n' +
     '-- Nur einmal einspielen: Das Skript überschreibt Änderungen, die später im Dashboard gemacht wurden.'
   ]
+
+  // (position) ist eindeutig: erst wegschieben, damit vertauschte Positionen den Upsert nicht stören.
+  parts.push(`update public.courses set position = position + 1000 where slug in (${courses.map(c => q(c.slug)).join(', ')});`)
 
   const courseRows = courses.map(c => `  (${q(c.slug)}, ${q(c.title)}, ${q(c.summary)}, ${c.position}, true)`)
   parts.push(

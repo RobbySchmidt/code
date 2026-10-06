@@ -70,7 +70,8 @@ Der Renderer der Kursseite würde bestimmte Zeichen als Befehl lesen. Deshalb gi
 
 - Kein `{{` im Text. Schreib `{{ name }}` immer in Backticks.
 - Kein Wort, das mit `:` oder `@` beginnt (zum Beispiel `:class` oder `@click`). Auch das gehört in Backticks.
-- Die Zeichenfolge `$lesson$` darf nirgends vorkommen, weil das SQL den Text damit einfasst.
+- Die Zeichenfolge `$lesson` darf nirgends vorkommen, auch nicht in Codeblöcken oder Inline-Code, weil das SQL den Text mit `$lesson$` einfasst.
+- Codeblöcke dürfen mit drei oder mehr Backticks oder mit `~~~` eingezäunt sein (bis zu drei Leerzeichen eingerückt). Ein Block wird nur von einem Zaun gleicher Art und mindestens gleicher Länge geschlossen.
 
 Das Erzeugungsskript bricht bei einem Verstoß mit Dateiname und Zeile ab. Die Zeilen werden ab 1 gezählt, die erste Zeile der Datei ist also Zeile 1.
 

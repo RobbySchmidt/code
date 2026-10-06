@@ -73,6 +73,36 @@ describe('parseLesson', () => {
   it('lehnt die Einfassung des SQL-Texts im Inhalt ab', () => {
     expect(() => parseLesson('01-a.md', `${head}\nText mit $lesson$ darin.\n`)).toThrow(/\$lesson\$/)
   })
+  it('lehnt $lesson$ auch innerhalb von Codeblöcken ab', () => {
+    const text = `${head}\nText.\n\n<!-- loesung -->\n\n\`\`\`js [a.js]\nconst x = '$lesson$'\n\`\`\`\n`
+    expect(() => parseLesson('01-a.md', text)).toThrow(/01-a\.md:12.*\$lesson\$/)
+  })
+
+  it('lehnt einen Text ab, der auf $lesson endet', () => {
+    expect(() => parseLesson('01-a.md', `${head}\nText endet auf $lesson`)).toThrow(/\$lesson/)
+  })
+
+  it('erkennt einen Vier-Backtick-Block, der einen Drei-Backtick-Block enthält', () => {
+    const block = '````md\n```vue\n<p>{{ x }}</p>\n```\n````\n'
+    expect(() => parseLesson('01-a.md', `${head}\n${block}`)).not.toThrow()
+    expect(() => parseLesson('01-a.md', `${head}\n${block}\nDanach {{ x }} im Text.\n`)).toThrow(/01-a\.md:13/)
+  })
+
+  it('erkennt Tilde-Blöcke', () => {
+    expect(() => parseLesson('01-a.md', `${head}\n~~~vue\n<p>{{ x }}</p>\n~~~\n`)).not.toThrow()
+  })
+
+  it('erkennt einen um zwei Leerzeichen eingerückten Block in einer Liste', () => {
+    const text = `${head}\n- Punkt\n\n  \`\`\`vue\n  <p>{{ x }}</p>\n  \`\`\`\n\nDanach {{ x }}.\n`
+    expect(() => parseLesson('01-a.md', text)).toThrow(/01-a\.md:13/)
+    expect(() => parseLesson('01-a.md', text.replace('\nDanach {{ x }}.', ''))).not.toThrow()
+  })
+
+  it('trennt die Musterlösung auch bei Leerzeichen hinter dem Marker', () => {
+    const lesson = parseLesson('01-a.md', `${head}\nText.\n\n<!-- loesung -->   \n\nCode.\n`)
+    expect(lesson.content).toBe('Text.')
+    expect(lesson.solution).toBe('Code.')
+  })
 })
 
 describe('extractFiles', () => {
@@ -91,6 +121,14 @@ describe('extractFiles', () => {
   it('lehnt Pfade ab, die aus dem Projekt herausführen', () => {
     expect(() => extractFiles('```js [../boese.js]\nx\n```\n')).toThrow(/\.\.\/boese\.js/)
     expect(() => extractFiles('```js [/etc/passwd]\nx\n```\n')).toThrow(/\/etc\/passwd/)
+  })
+  it('liefert den Code eines Vier-Backtick-Blocks mit Drei-Backtick-Zeile unverändert', () => {
+    const markdown = '````md [docs/a.md]\n```js\nx\n```\n````\n'
+    expect(extractFiles(markdown)).toEqual([{ path: 'docs/a.md', code: '```js\nx\n```\n' }])
+  })
+
+  it('erkennt eingerückte Blöcke mit Dateipfad', () => {
+    expect(extractFiles('- Punkt\n\n  ```js [a.js]\n  x\n  ```\n')).toEqual([{ path: 'a.js', code: '  x\n' }])
   })
 })
 
@@ -138,5 +176,16 @@ describe('buildSeedSql', () => {
     const lesson = courses[0].lessons[0]
     const broken = [{ ...courses[0], lessons: [lesson, { ...lesson, slug: 'zwei' }] }]
     expect(() => buildSeedSql(broken)).toThrow(/Position 1/)
+  })
+  it('verschiebt die Positionen der Kurse vor dem Upsert', () => {
+    const sql = buildSeedSql(courses)
+    const shift = sql.indexOf("update public.courses set position = position + 1000 where slug in ('erste-schritte', 'todo-app');")
+    expect(shift).toBeGreaterThan(-1)
+    expect(shift).toBeLessThan(sql.indexOf('insert into public.courses'))
+  })
+
+  it('lehnt einen ungültigen Adressteil und eine ungültige Position eines Kurses ab', () => {
+    expect(() => buildSeedSql([{ ...courses[0], slug: 'zwei worte' }])).toThrow(/zwei worte/)
+    expect(() => buildSeedSql([{ ...courses[0], position: 1.5 }])).toThrow(/erste-schritte/)
   })
 })
