@@ -10,7 +10,8 @@ export default defineNuxtConfig({
     head: {
       htmlAttrs: { lang: 'de' },
       titleTemplate: '%s · Nuxt für Einsteiger'
-    }
+    },
+    pageTransition: { name: 'page', mode: 'out-in' }
   },
   vite: {
     plugins: [tailwindcss()]

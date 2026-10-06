@@ -39,7 +39,7 @@ useSeoMeta({
           <LessonList :lessons="lessons" :completed-ids="completedIds" :current-slug="lesson.slug" />
         </div>
       </details>
-      <nav class="sticky top-8 hidden max-h-[calc(100vh-4rem)] overflow-y-auto lg:block" aria-label="Lektionen">
+      <nav class="sticky top-24 hidden max-h-[calc(100vh-8rem)] overflow-y-auto lg:block" aria-label="Lektionen">
         <LessonList :lessons="lessons" :completed-ids="completedIds" :current-slug="lesson.slug" />
       </nav>
     </aside>
