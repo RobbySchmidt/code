@@ -9,7 +9,7 @@ const error = ref('')
 // Nur interne Pfade zulassen, damit ?weiter= nicht auf fremde Seiten umleiten kann.
 const target = computed(() => {
   const next = route.query.weiter
-  return typeof next === 'string' && next.startsWith('/') && !next.startsWith('//') && next[1] !== '\\' ? next : '/lektionen'
+  return typeof next === 'string' && next.startsWith('/') && !next.startsWith('//') && next[1] !== '\\' ? next : '/kurse'
 })
 
 if (user.value) await navigateTo(target.value)

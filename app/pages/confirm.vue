@@ -6,7 +6,7 @@ const route = useRoute()
 const failed = ref(false)
 
 watch(user, (current) => {
-  if (current) navigateTo('/lektionen')
+  if (current) navigateTo('/kurse')
 }, { immediate: true })
 
 onMounted(() => {

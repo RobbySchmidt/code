@@ -1,5 +1,6 @@
 <script setup>
 const props = defineProps({
+  courseSlug: { type: String, required: true },
   lessons: { type: Array, required: true },
   completedIds: { type: Set, default: () => new Set() },
   completedAt: { type: Object, default: () => ({}) },
@@ -28,7 +29,7 @@ function formatDate(iso) {
       <ol class="overflow-hidden rounded-xl border border-mist/60 bg-paper">
         <li v-for="lesson in group.lessons" :key="lesson.id" class="border-b border-mist/60 last:border-b-0">
           <NuxtLink
-            :to="`/kurs/${lesson.slug}`"
+            :to="`/kurse/${courseSlug}/${lesson.slug}`"
             class="flex items-start gap-3 px-4 py-3 hover:bg-fog"
             :class="{ 'bg-fog': lesson.slug === currentSlug }"
             :aria-current="lesson.slug === currentSlug ? 'page' : undefined"

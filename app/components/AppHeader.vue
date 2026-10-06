@@ -10,7 +10,7 @@ const logout = useLogout()
         Nuxt für Einsteiger
       </NuxtLink>
       <nav class="flex items-center gap-4 text-sm font-medium text-ink" aria-label="Hauptmenü">
-        <NuxtLink to="/lektionen" class="transition-colors hover:text-ember" active-class="text-ember">Lektionen</NuxtLink>
+        <NuxtLink to="/kurse" class="transition-colors hover:text-ember" active-class="text-ember">Kurse</NuxtLink>
         <template v-if="user">
           <NuxtLink to="/profil" class="transition-colors hover:text-ember" active-class="text-ember">Profil</NuxtLink>
           <button type="button" class="btn-primary" @click="logout">Abmelden</button>
