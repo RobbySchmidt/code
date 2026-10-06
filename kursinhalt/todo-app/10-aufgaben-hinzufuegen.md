@@ -58,7 +58,7 @@ function greet() {
 - `if` prüft eine Bedingung, die in runden Klammern steht. `===` vergleicht zwei Werte und ist wahr, wenn sie gleich sind. `return` beendet die Funktion sofort. Die Zeile heißt also: Ist der Name leer, hör hier auf.
 - Mit einem einfachen Gleichheitszeichen gibst du einem Ref einen neuen Wert.
 
-Für die Aufgabe brauchst du außerdem `Date.now()`. Es liefert die aktuelle Uhrzeit als sehr große Zahl, gezählt in Tausendstelsekunden. Weil die Zahl jedes Mal eine andere ist, eignet sie sich als `id`.
+Für die Aufgabe brauchst du außerdem `Date.now()`. Es liefert die aktuelle Uhrzeit als sehr große Zahl, gezählt in Tausendstelsekunden. Weil die Zahl praktisch jedes Mal eine andere ist, eignet sie sich als `id`.
 
 ## Auf das Abschicken reagieren
 

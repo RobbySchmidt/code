@@ -20,8 +20,8 @@ Am meisten lernst du jetzt, wenn du die App nach deinen eigenen Wünschen umbaus
 
 1. **Ein eigenes Farbschema.** Ersetze überall `indigo` durch eine andere Farbe von Tailwind, zum Beispiel `emerald` oder `rose`, und probiere einen anderen Hintergrund aus.
 2. **Ein Filter für offene und erledigte Aufgaben.** Drei Buttons „Alle“, „Offen“ und „Erledigt“ setzen ein Ref, und ein berechneter Wert liefert mit `filter` die passende Liste für das `v-for`.
-3. **Aufgaben bearbeiten.** Ein Klick auf den Text macht aus ihm ein Eingabefeld mit `v-model`, und die Eingabetaste übernimmt die Änderung. Dafür braucht `TaskItem` ein drittes Event.
-4. **Ein Fälligkeitsdatum.** Ein `<input>` mit `type="date"` liefert ein Datum, das du als weiteren Wert im Objekt der Aufgabe ablegst und im Eintrag anzeigst.
+3. **Ein Fälligkeitsdatum.** Ein `<input>` mit `type="date"` liefert ein Datum, das du als weiteren Wert im Objekt der Aufgabe ablegst und im Eintrag anzeigst.
+4. **Aufgaben bearbeiten.** Ein Klick auf den Text macht aus ihm ein Eingabefeld mit `v-model`, und die Eingabetaste übernimmt die Änderung. Dafür braucht `TaskItem` ein drittes Event.
 5. **Die App veröffentlichen.** Bisher läuft sie nur auf deinem Rechner. Es gibt Anbieter, bei denen kleine Projekte kostenlos im Internet stehen dürfen. Die Anleitung von Nuxt auf `https://nuxt.com` beschreibt unter dem Stichwort „Deployment“, wie das geht.
 
 Wenn etwas nicht klappt, geh vor wie im Kurs: eine kleine Änderung, speichern, im Browser nachsehen. Und wenn du dich verrennst, hilft dir der Code unten zurück auf einen Stand, der funktioniert.

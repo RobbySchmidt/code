@@ -4,11 +4,11 @@ summary: Die App merkt sich deine Aufgaben, auch wenn du die Seite neu lädst od
 section: js
 ---
 
-Nach jedem Neuladen sind wieder die drei Beispielaufgaben da. Deine Daten leben nur, solange die Seite offen ist. Das änderst du jetzt.
+Nach jedem Neuladen sind wieder die drei Beispielaufgaben da. Das änderst du jetzt.
 
 ## Der Speicher des Browsers
 
-**`localStorage`** ist ein kleiner Speicher, den der Browser für jede Website führt. Was dort liegt, übersteht das Neuladen und das Schließen des Browsers. Er merkt sich Texte unter einem Namen:
+**`localStorage`** ist ein kleiner Speicher, den der Browser für jede Website führt. Was dort liegt, übersteht das Neuladen und das Schließen des Browsers. Er merkt sich Texte unter einem Namen. Ein Beispiel, das nicht in die App gehört:
 
 ```js
 localStorage.setItem('color', 'Blau')
@@ -17,7 +17,7 @@ const color = localStorage.getItem('color')
 
 `setItem` legt einen Text unter einem Namen ab, `getItem` holt ihn wieder. Liegt unter dem Namen nichts, liefert `getItem` den Wert `null`, das heißt „nichts“.
 
-Eine Liste ist kein Text. Dafür gibt es zwei Übersetzer: `JSON.stringify` macht aus einem Array oder Objekt einen Text, `JSON.parse` macht aus so einem Text wieder ein Array oder Objekt.
+Eine Liste ist kein Text. Dafür gibt es zwei Übersetzer: `JSON.stringify` macht aus einem Array oder Objekt einen Text, `JSON.parse` macht daraus wieder ein Array oder Objekt. Wieder nur ein Beispiel:
 
 ```js
 const text = JSON.stringify(['Rot', 'Blau'])
@@ -34,19 +34,21 @@ watch(tasks, () => {
 }, { deep: true })
 ```
 
-In den Klammern von `watch` stehen drei Dinge: was beobachtet wird, was dann geschehen soll, und eine Einstellung. `deep: true` heißt, dass Vue auch in die Liste hineinschaut. So zählt nicht nur eine ausgetauschte Liste als Änderung, sondern auch eine neue Aufgabe oder ein umgedrehtes `done`. Auch `watch` stellt Nuxt von selbst bereit, genau wie `onMounted`, das gleich folgt.
+In den Klammern stehen das beobachtete Ref, die Funktion und eine Einstellung. `deep: true` heißt, dass Vue auch in die Liste hineinschaut. So zählt nicht nur eine ausgetauschte Liste als Änderung, sondern auch eine neue Aufgabe oder ein umgedrehtes `done`. Auch `watch` stellt Nuxt von selbst bereit, genau wie `onMounted`, das gleich folgt.
 
-Speichere und hake eine Aufgabe ab. Auf der Seite siehst du davon nichts, aber in den Entwicklerwerkzeugen: Öffne sie wie beim Feinschliff und such den Bereich für gespeicherte Daten. In Chrome und Edge heißt er „Application“, in Firefox „Web-Speicher“, bei dir vielleicht etwas anders. Unter „Local Storage“ und der Adresse deiner App steht ein Eintrag `tasks` mit deiner Liste als Text.
+Speichere und hake eine Aufgabe ab. Vom Speichern selbst siehst du auf der Seite nichts, wohl aber in den Entwicklerwerkzeugen: Öffne sie wie beim Feinschliff und such den Bereich für gespeicherte Daten. In Chrome und Edge heißt er „Application“, in Firefox „Web-Speicher“, bei dir vielleicht etwas anders. Unter „Local Storage“ und der Adresse deiner App steht ein Eintrag `tasks` mit deiner Liste als Text.
 
 Lade die Seite neu. Trotzdem erscheinen wieder die Beispielaufgaben, denn gespeichert wird schon, geladen noch nicht.
 
 ## Laden, sobald die Seite im Browser ist
 
-Naheliegend wäre, den Speicher gleich oben im Script-Teil auszulesen. Das scheitert. Nuxt baut die Seite zuerst auf dem Server zusammen, also in dem Programm, das in deinem Terminal läuft, und schickt sie fertig an den Browser. Der Server kennt den Speicher des Browsers nicht. `localStorage` gibt es dort nicht, und die Seite bräche mit einem Fehler ab.
+Naheliegend wäre, den Speicher gleich oben im Script-Teil auszulesen. Das scheitert. Nuxt baut die Seite zuerst auf dem Server zusammen, also in dem Programm, das in deinem Terminal läuft, und schickt sie fertig an den Browser. Der Server hat keinen Zugriff auf den Speicher deines Browsers, und die Seite bräche mit einem Fehler ab.
 
-`onMounted` löst das. Es bekommt eine Funktion, und die läuft nur im Browser, sobald die Seite dort angezeigt wird:
+`onMounted` löst das. Es bekommt eine Funktion, und die läuft nur im Browser, sobald die Seite dort angezeigt wird. Ein Beispiel, das nicht in die App gehört:
 
 ```js
+const message = ref('')
+
 onMounted(() => {
   message.value = 'Jetzt bin ich im Browser'
 })
@@ -62,14 +64,13 @@ Bei `watch` gibt es das Problem nicht: Seine Funktion läuft erst, wenn sich im 
 
 Tipp: Ob etwas gespeichert war, prüfst du mit `if` und dem geladenen Wert in den Klammern, ganz ohne Vergleich. `null` zählt als falsch, jeder gespeicherte Text als wahr. Für den Button kennst du `v-if`, `length` und „größer als“.
 
-Wenn es geklappt hat, bleiben deine Aufgaben nach dem Neuladen stehen, samt Häkchen. „Alle löschen“ leert die Liste, der Hinweis erscheint, und der Button verschwindet.
+Wenn es geklappt hat, bleiben deine Aufgaben nach dem Neuladen stehen, samt Häkchen. Auch die drei Beispielaufgaben sind noch da: Sie kommen jetzt aus dem Speicher. Mit „Alle löschen“ wirst du sie los. Dann erscheint der Hinweis, und der Button verschwindet.
 
 ### Wenn es nicht klappt
 
-- **Eine Meldung sagt, `localStorage` sei nicht definiert:** Der Zugriff steht direkt im Script-Teil statt in der Funktion von `onMounted`.
+- **Eine Fehlermeldung nennt `localStorage`:** Der Zugriff steht direkt im Script-Teil statt in der Funktion von `onMounted`.
 - **Nach dem Neuladen ist die Liste leer:** Der Name in `getItem` ist anders geschrieben als der in `setItem`, oder die Zuweisung an `tasks.value` fehlt.
-- **Neue Aufgaben werden gespeichert, Häkchen aber nicht:** Bei `watch` fehlt `{ deep: true }`.
-- **Beim Laden blitzt kurz der Hinweis auf:** Das ist normal. Der Server schickt die Seite mit leerer Liste, und erst der Browser trägt deine Aufgaben ein.
+- **Neue Aufgaben und Häkchen werden erst gespeichert, wenn du eine Aufgabe löschst:** Bei `watch` fehlt `{ deep: true }`.
 
 <!-- loesung -->
 

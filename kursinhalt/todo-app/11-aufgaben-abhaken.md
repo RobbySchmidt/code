@@ -26,7 +26,7 @@ Vorn steht die Bedingung. Ist sie wahr, gilt der Wert hinter dem Fragezeichen, s
 
 Die Klassen, die immer gelten, bleiben in `class`. Die Farbe ist nach `:class` gewandert. Ein Tag darf beide Attribute haben, Vue fügt die Klassen zusammen. Achte auf die Anführungszeichen: außen doppelte um das ganze Attribut, innen einfache um die beiden Texte.
 
-Speichere. Die erste Aufgabe ist wieder grau und durchgestrichen, denn ihr `done` ist `true`. Setze im Script-Teil bei einer anderen Aufgabe `done` auf `true`, und auch sie wird durchgestrichen. Stell danach den alten Wert wieder ein.
+Speichere. Die erste Aufgabe ist wieder grau und durchgestrichen, denn ihr `done` ist `true`.
 
 ## Auf einen Klick reagieren
 
@@ -60,9 +60,10 @@ const books = ref([
 ])
 
 const book = books.value.find(book => book.title === 'Krabat')
+book.title = 'Krabat, neue Ausgabe'
 ```
 
-In den Klammern von `find` steht eine Funktion in Kurzform. Vor dem Pfeil `=>` steht der Name für den Eintrag, der gerade geprüft wird, dahinter die Bedingung. `book` ist danach das zweite Objekt. Es ist keine Kopie: Änderst du daran etwas, ändert es sich in der Liste.
+In den Klammern von `find` steht eine Funktion in Kurzform. Vor dem Pfeil `=>` steht der Name für den Eintrag, der gerade geprüft wird, dahinter die Bedingung. `book` ist danach das zweite Objekt, und die letzte Zeile gibt ihm einen neuen Titel. `book` ist ein gewöhnliches Objekt und kein Ref, darum steht dort kein `.value`. Es ist auch keine Kopie: Die Änderung gilt in der Liste.
 
 Ein Ausrufezeichen vor einem Wahrheitswert dreht ihn um. Aus `true` wird `false` und umgekehrt:
 
@@ -88,7 +89,7 @@ Wenn es geklappt hat, füllt ein Klick auf einen leeren Kreis ihn mit einem Häk
 - **Der Browser zeigt nach der Änderung an `:class` einen Fehler:** Die Anführungszeichen stimmen nicht. Steht innen ein doppeltes, endet das Attribut dort zu früh.
 - **Der Klick bewirkt nichts:** `@click` steht nicht am Button mit dem Kreis, oder im Aufruf fehlt `task.id` in den Klammern.
 - **Der Text wird durchgestrichen, aber der Kreis bleibt leer:** In `class` stehen noch Klassen für einen Zustand, zum Beispiel `text-transparent`. Sie gehören nur nach `:class`.
-- **Es wird immer dieselbe Aufgabe abgehakt:** In `find` vergleichst du mit einer festen Zahl statt mit der übergebenen `id`.
+- **Der Klick bewirkt nichts, obwohl `@click` stimmt:** In der Funktion steht `task.value.done`. `.value` gehört nur hinter `tasks`. Die gefundene Aufgabe ist ein gewöhnliches Objekt.
 
 <!-- loesung -->
 

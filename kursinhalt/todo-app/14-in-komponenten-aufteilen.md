@@ -78,7 +78,7 @@ Wenn es geklappt hat, sieht die App genauso aus wie vor dieser Lektion, und Abha
 - **Die Kreise sind leer, oder die Papierkörbe fehlen:** In `TaskItem.vue` fehlt der Import der Icons.
 - **Die Klicks bewirken nichts:** Der Name des Events muss an drei Stellen gleich geschrieben sein: in `defineEmits`, in `$emit` und hinter dem `@` in `app/app.vue`. Oder es fehlt `task.id` als zweiter Wert in `$emit`.
 - **Die Liste bleibt leer, und eine Meldung sagt, `TaskItem` sei nicht bekannt:** Die Datei liegt nicht in `app/components` oder heißt anders. Stimmt beides, stoppe den Entwicklungsserver und starte ihn neu.
-- **Eine Meldung sagt, `checkTask` sei nicht definiert:** Die Komponente ruft die Funktion noch direkt auf. Sie kennt nur ihr Prop und ihre Events.
+- **Eine Meldung nennt `checkTask`:** Die Komponente ruft die Funktion noch direkt auf. Sie kennt nur ihr Prop und ihre Events.
 
 <!-- loesung -->
 
