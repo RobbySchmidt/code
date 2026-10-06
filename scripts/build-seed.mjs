@@ -1,14 +1,19 @@
 // Erzeugt supabase/seeds/courses.sql aus allen Kursordnern in kursinhalt/.
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { basename, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { buildSeedSql, parseLesson } from './course-content.mjs'
+import { buildSeedSql, parseLesson, seedFileName, selectCourses } from './course-content.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const contentDir = join(root, 'kursinhalt')
-const outFile = join(root, 'supabase', 'seeds', 'courses.sql')
+const seedDir = join(root, 'supabase', 'seeds')
+const argv = process.argv.slice(2)
+const prune = argv.includes('--prune')
+const wanted = argv.filter(arg => !arg.startsWith('--'))
 
 try {
+  const unknownFlag = argv.find(arg => arg.startsWith('--') && arg !== '--prune')
+  if (unknownFlag) throw new Error(`Unbekannte Option ${unknownFlag} (erlaubt: --prune).`)
   const courses = []
   const folders = readdirSync(contentDir, { withFileTypes: true })
     .filter(entry => entry.isDirectory() && existsSync(join(contentDir, entry.name, 'kurs.json')))
@@ -32,11 +37,13 @@ try {
     courses.push({ ...meta, lessons })
   }
 
-  const sql = buildSeedSql(courses)
+  const selected = selectCourses(courses, wanted)
+  const sql = buildSeedSql(selected, { prune, knownSlugs: courses.map(c => c.slug) })
+  const outFile = join(seedDir, seedFileName(wanted.length ? selected.map(c => c.slug) : []))
   mkdirSync(dirname(outFile), { recursive: true })
   writeFileSync(outFile, sql, { encoding: 'utf8' })
-  for (const course of courses) console.log(`${course.slug}: ${course.lessons.length} Lektionen`)
-  console.log(`Geschrieben: supabase/seeds/courses.sql`)
+  for (const course of selected) console.log(`${course.slug}: ${course.lessons.length} Lektionen`)
+  console.log(`Geschrieben: supabase/seeds/${basename(outFile)}${prune ? ' (mit --prune)' : ''}`)
 } catch (error) {
   console.error(error.message)
   process.exit(1)

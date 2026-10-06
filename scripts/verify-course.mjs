@@ -3,6 +3,9 @@
 //
 // Aufruf: yarn content:verify <kurs-slug> [--from <NN>] [--to <NN>]
 //
+// Nach jedem Build wird die gebaute App gestartet, / abgerufen (erwartet: 200) und
+// wieder beendet. Die npm-Pakete für das Prüfprojekt stehen in kurs.json ("packages").
+//
 // Das Skript startet nie etwas auf Port 3000 und beendet jeden Prozess, den es
 // gestartet hat, auch im Fehlerfall.
 import { spawn, spawnSync } from 'node:child_process'
@@ -20,7 +23,7 @@ const isWindows = process.platform === 'win32'
 // drei Angaben bricht das Werkzeug in einem Terminal ohne Tastatur ab; interaktiv
 // fragt es Vorlage, Ordner, Paketmanager, Git und (optional) Module.
 const SCAFFOLD_ARGS = ['--template', 'minimal', '--packageManager', 'npm', '--no-gitInit']
-const EXTRA_PACKAGES = ['tailwindcss', '@tailwindcss/vite', '@lucide/vue']
+const READY_MARKER = '.kurs-check-bereit'
 
 const children = new Set()
 
@@ -85,39 +88,53 @@ function parseArgs(argv) {
     else throw new Error(`Unbekanntes Argument: ${argv[i]}`)
   }
   if (!args.slug) throw new Error('Aufruf: yarn content:verify <kurs-slug> [--from <NN>] [--to <NN>]')
+  if (!/^[a-z0-9-]+$/.test(args.slug)) throw new Error(`Ungültiger Kurs-Adressteil "${args.slug}": erlaubt sind Kleinbuchstaben, Ziffern und Bindestriche.`)
   if (Number.isNaN(args.from) || Number.isNaN(args.to)) throw new Error('--from und --to brauchen eine Zahl.')
   return args
 }
 
-function readLessons(slug) {
+function readCourse(slug) {
   const contentDir = join(repoRoot, 'kursinhalt')
+  const readMeta = entry => JSON.parse(readFileSync(join(contentDir, entry.name, 'kurs.json'), 'utf8'))
   const folder = readdirSync(contentDir, { withFileTypes: true })
     .filter(entry => entry.isDirectory() && existsSync(join(contentDir, entry.name, 'kurs.json')))
-    .find(entry => JSON.parse(readFileSync(join(contentDir, entry.name, 'kurs.json'), 'utf8')).slug === slug)
+    .find(entry => readMeta(entry).slug === slug)
   if (!folder) throw new Error(`Kein Kurs mit dem Adressteil "${slug}" in kursinhalt/ gefunden.`)
   const dir = join(contentDir, folder.name)
-  return readdirSync(dir)
+  const packages = readMeta(folder).packages ?? []
+  if (!Array.isArray(packages) || packages.some(name => typeof name !== 'string' || !name)) {
+    throw new Error(`${folder.name}/kurs.json: packages muss eine Liste von Paketnamen sein.`)
+  }
+  const lessons = readdirSync(dir)
     .filter(name => name.endsWith('.md') && name !== 'README.md')
     .sort()
     .map((name) => {
       const lesson = parseLesson(name, readFileSync(join(dir, name), 'utf8'))
       return { ...lesson, files: lesson.solution ? extractFiles(lesson.solution) : [] }
     })
+  return { lessons, packages }
 }
 
-async function ensureProject(projectDir) {
-  if (existsSync(join(projectDir, 'package.json')) && existsSync(join(projectDir, 'node_modules', '@lucide'))) return
-  const parent = dirname(projectDir)
-  const name = projectDir.slice(parent.length + 1)
-  if (!existsSync(join(projectDir, 'package.json'))) {
+async function ensureProject(projectDir, packages) {
+  const marker = join(projectDir, READY_MARKER)
+  if (!existsSync(marker)) {
+    const parent = dirname(projectDir)
+    const name = projectDir.slice(parent.length + 1)
     console.log(`Lege das Prüfprojekt an: ${projectDir}`)
     rmSync(projectDir, { recursive: true, force: true })
     const created = await run('npm', ['create', 'nuxt@latest', '--', name, ...SCAFFOLD_ARGS], { cwd: parent, shell: true })
     if (created.code !== 0) throw new Error(`npm create nuxt ist fehlgeschlagen:\n${lastLines(created.output, 40)}`)
+    writeFileSync(marker, 'Gerüst angelegt\n')
   }
-  console.log(`Installiere ${EXTRA_PACKAGES.join(' ')}`)
-  const installed = await run('npm', ['install', ...EXTRA_PACKAGES], { cwd: projectDir, shell: true })
-  if (installed.code !== 0) throw new Error(`npm install ist fehlgeschlagen:\n${lastLines(installed.output, 40)}`)
+  const manifest = JSON.parse(readFileSync(join(projectDir, 'package.json'), 'utf8'))
+  const installed = { ...manifest.dependencies, ...manifest.devDependencies }
+  const missing = packages.filter(name => !(name in installed))
+  if (missing.length) {
+    console.log(`Installiere ${missing.join(' ')}`)
+    const result = await run('npm', ['install', ...missing], { cwd: projectDir, shell: true })
+    if (result.code !== 0) throw new Error(`npm install ist fehlgeschlagen:
+${lastLines(result.output, 40)}`)
+  }
 }
 
 // Merkt sich den Ausgangszustand jeder vom Kurs berührten Datei und spielt ihn zurück.
@@ -195,14 +212,13 @@ async function checkServer(projectDir) {
 
 async function main() {
   const args = parseArgs(process.argv.slice(2))
-  const lessons = readLessons(args.slug)
+  const { lessons, packages } = readCourse(args.slug)
   const projectDir = join(tmpdir(), `kurs-check-${args.slug}`)
-  await ensureProject(projectDir)
+  await ensureProject(projectDir, packages)
 
   resetFiles(projectDir, [...new Set(lessons.flatMap(lesson => lesson.files.map(file => file.path)))])
 
   const report = []
-  let lastBuilt = null
   for (const lesson of lessons) {
     if (lesson.position > args.to) break
     const label = `${String(lesson.position).padStart(2, '0')} ${lesson.slug}`
@@ -227,21 +243,17 @@ async function main() {
       process.exitCode = 1
       return
     }
-    lastBuilt = label
-    report.push(`${label} ${written} ok`)
-  }
-
-  if (lastBuilt) {
     try {
       const port = await checkServer(projectDir)
-      report.push(`Server nach ${lastBuilt}: / antwortet mit 200 (Port ${port})`)
+      report.push(`${label} ${written} ok, / antwortet mit 200 (Port ${port})`)
     } catch (error) {
       console.log(report.join('\n'))
-      console.error(`${lastBuilt} FEHLER: ${error.message}`)
+      console.error(`${label} ${written} FEHLER: ${error.message}`)
       process.exitCode = 1
       return
     }
   }
+
   console.log(report.join('\n'))
 }
 

@@ -5,6 +5,9 @@ export const SECTIONS = ['start', 'html', 'css', 'js', 'abschluss']
 const SOLUTION_MARKER = '<!-- loesung -->'
 const FILE_NAME = /^(\d{2})-([a-z0-9-]+)\.md$/
 const COMMAND_START = /(^|[\s(])[:@][A-Za-zÄÖÜäöü]/
+const AFTER_MARK = /[*_"„'][:@][A-Za-zÄÖÜäöü]/
+const HTML_TAG = /<[A-Za-z/!]/
+const MDC_BLOCK = /^ *::[A-Za-z]/
 
 function fail(fileName, message, line) {
   return new Error(line === undefined ? `${fileName}: ${message}` : `${fileName}:${line}: ${message}`)
@@ -63,7 +66,18 @@ function checkBody(fileName, lines, firstIndex) {
     if (state !== 'outside') return
     const prose = line.replace(/`[^`]*`/g, '')
     if (prose.includes('{{')) throw fail(fileName, 'Doppelte geschweifte Klammern gehören in Code-Auszeichnung (Backticks).', lineNo)
-    if (COMMAND_START.test(prose)) throw fail(fileName, 'Ein Wort mit führendem : oder @ gehört in Code-Auszeichnung (Backticks).', lineNo)
+    if (COMMAND_START.test(prose) || AFTER_MARK.test(prose)) {
+      throw fail(fileName, 'Ein Wort mit führendem : oder @ (auch direkt hinter *, _ oder einem Anführungszeichen) gehört in Code-Auszeichnung: schreib es in `Backticks`, zum Beispiel `:class` statt **:class**.', lineNo)
+    }
+    if (line.trim() !== SOLUTION_MARKER) {
+      const tag = HTML_TAG.exec(prose)
+      if (tag) {
+        throw fail(fileName, `Ein < direkt vor einem Buchstaben, / oder ! (hier "${prose.slice(tag.index, tag.index + 8).trim()}") würde als HTML gelesen: schreib das Tag in Backticks, zum Beispiel \`<div>\`, oder setz ein Leerzeichen hinter das <.`, lineNo)
+      }
+    }
+    if (MDC_BLOCK.test(prose)) {
+      throw fail(fileName, 'Eine Zeile, die mit :: und einem Buchstaben beginnt, wäre ein Block-Baustein des Renderers: setz sie in einen Codeblock oder in `Backticks`.', lineNo)
+    }
   })
   if (inCode) throw fail(fileName, 'Ein Codeblock ist nicht geschlossen.')
 }
@@ -127,7 +141,7 @@ export function extractFiles(markdown) {
 const q = value => `'${String(value).replaceAll("'", "''")}'`
 const courseId = slug => `(select id from public.courses where slug = ${q(slug)})`
 
-function validate(courses) {
+function validate(courses, knownSlugs) {
   for (const course of courses) {
     if (typeof course.slug !== 'string' || !/^[a-z0-9-]+$/.test(course.slug)) {
       throw new Error(`Kurs "${course.slug}": Der Adressteil darf nur Kleinbuchstaben, Ziffern und Bindestriche enthalten.`)
@@ -145,7 +159,7 @@ function validate(courses) {
     positions.add(course.position)
   }
   for (const course of courses) {
-    if (course.recommended && !slugs.has(course.recommended)) {
+    if (course.recommended && !slugs.has(course.recommended) && !knownSlugs.includes(course.recommended)) {
       throw new Error(`Kurs "${course.slug}": Der empfohlene Kurs "${course.recommended}" existiert nicht.`)
     }
     const lessonSlugs = new Set()
@@ -159,12 +173,36 @@ function validate(courses) {
   }
 }
 
-export function buildSeedSql(courses) {
-  validate(courses)
-  const parts = [
-    '-- Erzeugt von `yarn content:seed`. Nicht von Hand ändern.\n' +
-    '-- Nur einmal einspielen: Das Skript überschreibt Änderungen, die später im Dashboard gemacht wurden.'
-  ]
+// Wählt die Kurse mit den genannten Adressteilen (leer = alle) in der Reihenfolge der Kurse.
+export function selectCourses(courses, slugs) {
+  if (!slugs.length) return courses
+  const unknown = slugs.filter(slug => !courses.some(c => c.slug === slug))
+  if (unknown.length) {
+    throw new Error(`Unbekannter Kurs ${unknown.map(s => `"${s}"`).join(', ')} (vorhanden: ${courses.map(c => c.slug).join(', ')}).`)
+  }
+  return courses.filter(c => slugs.includes(c.slug))
+}
+
+export function seedFileName(slugs) {
+  return slugs.length ? `courses-${slugs.join('-')}.sql` : 'courses.sql'
+}
+
+const HEADER = [
+  '-- Erzeugt von `yarn content:seed`. Nicht von Hand ändern.',
+  '--',
+  '-- Diese Datei legt die unten genannten Kurse und Lektionen an oder aktualisiert sie.',
+  '-- Beim Einspielen werden Titel, Kurzbeschreibung, Text, Musterlösung, Position und',
+  '-- Veröffentlichungsstatus dieser Kurse und Lektionen mit der Fassung aus dem Repository',
+  '-- überschrieben. Änderungen, die im Supabase-Dashboard gemacht wurden, gehen dabei verloren.',
+  '-- Mit `--prune` erzeugt, werden außerdem Lektionen gelöscht, die im Repository fehlen,',
+  '-- samt dem Fortschritt der Lernenden dazu. Ohne `--prune` wird nichts gelöscht.',
+  '-- Alles läuft in einer Transaktion: Bei einem Fehler bleibt die Datenbank unverändert.'
+].join('\n')
+
+export function buildSeedSql(courses, options = {}) {
+  const { prune = false, knownSlugs = [] } = options
+  validate(courses, knownSlugs)
+  const parts = [HEADER, 'begin;']
 
   // (position) ist eindeutig: erst wegschieben, damit vertauschte Positionen den Upsert nicht stören.
   parts.push(`update public.courses set position = position + 1000 where slug in (${courses.map(c => q(c.slug)).join(', ')});`)
@@ -185,6 +223,10 @@ export function buildSeedSql(courses) {
   }
 
   for (const course of courses) {
+    if (!prune) {
+      parts.push(`-- Hinweis (${course.slug}): Lektionen, die im Repository fehlen, bleiben in der Datenbank. Zum Löschen \`yarn content:seed --prune\` verwenden.`)
+      continue
+    }
     const keep = course.lessons.map(l => q(l.slug)).join(', ')
     parts.push(
       `delete from public.lessons\nwhere course_id = ${courseId(course.slug)}` +
@@ -204,7 +246,7 @@ export function buildSeedSql(courses) {
       '  )'
     )
     parts.push(
-      `update public.lessons set position = position + 1000\nwhere course_id = ${courseId(course.slug)};`
+      `update public.lessons set position = position + 1000\nwhere course_id = ${courseId(course.slug)}\n  and slug in (${course.lessons.map(l => q(l.slug)).join(', ')});`
     )
     parts.push(
       'insert into public.lessons (course_id, slug, title, summary, position, section, content, solution, published) values\n' +
@@ -215,5 +257,6 @@ export function buildSeedSql(courses) {
     )
   }
 
+  parts.push('commit;')
   return `${parts.join('\n\n')}\n`
 }

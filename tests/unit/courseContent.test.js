@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildSeedSql, extractFiles, parseLesson } from '../../scripts/course-content.mjs'
+import { buildSeedSql, extractFiles, parseLesson, seedFileName, selectCourses } from '../../scripts/course-content.mjs'
 
 const head = '---\ntitle: Die erste Seite\nsummary: Dein erstes HTML.\nsection: html\n---\n'
 
@@ -105,6 +105,37 @@ describe('parseLesson', () => {
   })
 })
 
+describe('parseLesson: Auszeichnungen in Prosa', () => {
+  const lesson = body => parseLesson('01-a.md', `${head}\n${body}\n`)
+
+  it('lehnt ein nacktes HTML-Tag außerhalb von Code ab und nennt Datei, Zeile und Abhilfe', () => {
+    expect(() => lesson('Nutze das <div> Element.')).toThrow(/01-a\.md:7.*<div>.*`/)
+    expect(() => lesson('Schluss </div> hier.')).toThrow(/01-a\.md:7/)
+    expect(() => lesson('Ein <!-- Kommentar --> hier.')).toThrow(/01-a\.md:7/)
+  })
+
+  it('erlaubt < in Inline-Code, in Codeblöcken, vor einem Leerzeichen und die Marker-Zeile', () => {
+    expect(() => lesson('Nutze `<div>` im Text.')).not.toThrow()
+    expect(() => lesson('```vue\n<div>\n```')).not.toThrow()
+    expect(() => lesson('Der Wert ist kleiner als 5 < 10.')).not.toThrow()
+    expect(() => lesson('Text.\n\n<!-- loesung -->\n\nCode.')).not.toThrow()
+  })
+
+  it('lehnt eine Zeile ab, die mit :: und einem Buchstaben beginnt', () => {
+    expect(() => lesson('::card\nText\n::')).toThrow(/01-a\.md:7.*::.*`/)
+    expect(() => lesson('```md\n::card\n```')).not.toThrow()
+  })
+
+  it('lehnt : oder @ direkt hinter *, _, Anführungszeichen ab', () => {
+    expect(() => lesson('Nutze **:class** hier.')).toThrow(/01-a\.md:7.*`/)
+    expect(() => lesson('Nutze _@click_ hier.')).toThrow(/01-a\.md:7/)
+    expect(() => lesson('Nutze „:class“ hier.')).toThrow(/01-a\.md:7/)
+    expect(() => lesson('Nutze "@click" hier.')).toThrow(/01-a\.md:7/)
+    expect(() => lesson("Nutze '@click' hier.")).toThrow(/01-a\.md:7/)
+    expect(() => lesson('Nutze **`:class`** hier.')).not.toThrow()
+  })
+})
+
 describe('extractFiles', () => {
   it('liefert Pfad und Code aller Codeblöcke mit Dateipfad in Reihenfolge', () => {
     const markdown = '```vue [app/app.vue]\n<template />\n```\n\nText\n\n```css [app/assets/css/main.css]\n@import "tailwindcss";\n```\n'
@@ -164,7 +195,44 @@ describe('buildSeedSql', () => {
   })
 
   it('entfernt Lektionen eines Kurses, die es im Inhalt nicht mehr gibt', () => {
-    expect(buildSeedSql(courses)).toMatch(/delete from public\.lessons\s+where course_id = \(select id from public\.courses where slug = 'todo-app'\)\s+and slug not in \('seite'\)/)
+    expect(buildSeedSql(courses, { prune: true })).toMatch(/delete from public\.lessons\s+where course_id = \(select id from public\.courses where slug = 'todo-app'\)\s+and slug not in \('seite'\)/)
+  })
+
+  it('ignoriert Felder wie packages aus kurs.json', () => {
+    expect(buildSeedSql([{ ...courses[0], packages: ['geheim-paket'] }])).not.toContain('geheim-paket')
+  })
+
+  it('umschließt alles mit begin und commit', () => {
+    const sql = buildSeedSql(courses)
+    const statements = sql.replace(/^--.*$/gm, '').trim()
+    expect(statements.startsWith('begin;')).toBe(true)
+    expect(statements.endsWith('commit;')).toBe(true)
+    expect(statements.split('\n\n')[1]).toMatch(/^update public\.courses set position/)
+  })
+
+  it('löscht ohne prune keine Lektionen, sondern nennt den Schalter pro Kurs', () => {
+    const sql = buildSeedSql(courses)
+    expect(sql).not.toMatch(/^delete from/m)
+    expect(sql.match(/^-- Hinweis .*--prune/gm)).toHaveLength(2)
+    expect(sql).toMatch(/^-- Hinweis \(todo-app\)/m)
+  })
+
+  it('löscht mit prune Lektionen, die im Inhalt fehlen', () => {
+    expect(buildSeedSql(courses, { prune: true })).toMatch(/^delete from public\.lessons/m)
+  })
+
+  it('beschreibt im Kopf, was die Datei tut', () => {
+    const header = buildSeedSql(courses).split('begin;')[0]
+    expect(header).toMatch(/überschrieben/)
+    expect(header).toMatch(/Dashboard/)
+    expect(header).toMatch(/--prune/)
+    expect(header).toMatch(/Fortschritt/)
+  })
+
+  it('erlaubt einen empfohlenen Kurs, der nur als bekannt übergeben wird', () => {
+    const only = [courses[1]]
+    expect(() => buildSeedSql(only)).toThrow(/erste-schritte/)
+    expect(buildSeedSql(only, { knownSlugs: ['erste-schritte'] })).toContain("where slug = 'erste-schritte'")
   })
 
   it('lehnt einen empfohlenen Kurs ab, den es nicht gibt', () => {
@@ -187,5 +255,26 @@ describe('buildSeedSql', () => {
   it('lehnt einen ungültigen Adressteil und eine ungültige Position eines Kurses ab', () => {
     expect(() => buildSeedSql([{ ...courses[0], slug: 'zwei worte' }])).toThrow(/zwei worte/)
     expect(() => buildSeedSql([{ ...courses[0], position: 1.5 }])).toThrow(/erste-schritte/)
+  })
+})
+
+describe('selectCourses und seedFileName', () => {
+  const all = [{ slug: 'a' }, { slug: 'b' }, { slug: 'c' }]
+
+  it('liefert ohne Angabe alle Kurse', () => {
+    expect(selectCourses(all, [])).toEqual(all)
+  })
+
+  it('liefert nur die genannten Kurse in der Reihenfolge der Kurse', () => {
+    expect(selectCourses(all, ['c', 'a'])).toEqual([{ slug: 'a' }, { slug: 'c' }])
+  })
+
+  it('lehnt einen unbekannten Adressteil ab und nennt ihn', () => {
+    expect(() => selectCourses(all, ['a', 'x'])).toThrow(/"x"/)
+  })
+
+  it('benennt die Datei: voll courses.sql, teilweise courses-<slug>.sql', () => {
+    expect(seedFileName([])).toBe('courses.sql')
+    expect(seedFileName(['galerie', 'blog'])).toBe('courses-galerie-blog.sql')
   })
 })
