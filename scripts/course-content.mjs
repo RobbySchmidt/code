@@ -22,11 +22,11 @@ function readHead(fileName, lines) {
   return { head, end }
 }
 
-// Zeilen werden ab 0 gezählt (so verlangen es die Tests in courseContent.test.js).
+// Zeilennummern zählen ab 1 (erste Zeile der Datei = 1).
 function checkBody(fileName, lines, firstIndex) {
   let inCode = false
   lines.forEach((line, i) => {
-    const lineNo = firstIndex + i
+    const lineNo = firstIndex + i + 1
     if (line.startsWith('```')) {
       inCode = !inCode
       return

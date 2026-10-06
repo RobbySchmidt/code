@@ -72,7 +72,7 @@ Der Renderer der Kursseite würde bestimmte Zeichen als Befehl lesen. Deshalb gi
 - Kein Wort, das mit `:` oder `@` beginnt (zum Beispiel `:class` oder `@click`). Auch das gehört in Backticks.
 - Die Zeichenfolge `$lesson$` darf nirgends vorkommen, weil das SQL den Text damit einfasst.
 
-Das Erzeugungsskript bricht bei einem Verstoß mit Dateiname und Zeile ab. Die Zeilen werden dabei ab 0 gezählt, die erste Zeile der Datei ist also Zeile 0.
+Das Erzeugungsskript bricht bei einem Verstoß mit Dateiname und Zeile ab. Die Zeilen werden ab 1 gezählt, die erste Zeile der Datei ist also Zeile 1.
 
 ## Befehle
 

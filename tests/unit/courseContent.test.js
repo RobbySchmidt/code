@@ -48,7 +48,7 @@ describe('parseLesson', () => {
 
   it('lehnt doppelte geschweifte Klammern außerhalb von Code ab und nennt die Zeile', () => {
     const text = `${head}\nZeile eins.\n\nMit {{ name }} gibst du etwas aus.\n`
-    expect(() => parseLesson('01-a.md', text)).toThrow(/01-a\.md:8/)
+    expect(() => parseLesson('01-a.md', text)).toThrow(/01-a\.md:9/)
   })
 
   it('erlaubt doppelte geschweifte Klammern in Inline-Code und in Codeblöcken', () => {
@@ -57,7 +57,7 @@ describe('parseLesson', () => {
   })
 
   it('lehnt ein Wort mit führendem Doppelpunkt außerhalb von Code ab', () => {
-    expect(() => parseLesson('01-a.md', `${head}\nNutze :class für Klassen.\n`)).toThrow(/01-a\.md:6/)
+    expect(() => parseLesson('01-a.md', `${head}\nNutze :class für Klassen.\n`)).toThrow(/01-a\.md:7/)
   })
 
   it('erlaubt Doppelpunkte am Wortende, in Uhrzeiten und in Adressen', () => {
@@ -67,7 +67,7 @@ describe('parseLesson', () => {
 
   it('prüft auch die Musterlösung', () => {
     const text = `${head}\nText.\n\n<!-- loesung -->\n\nHier steht {{ falsch }}.\n`
-    expect(() => parseLesson('01-a.md', text)).toThrow(/01-a\.md:10/)
+    expect(() => parseLesson('01-a.md', text)).toThrow(/01-a\.md:11/)
   })
 
   it('lehnt die Einfassung des SQL-Texts im Inhalt ab', () => {
