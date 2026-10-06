@@ -4,13 +4,19 @@ summary: Du schreibst dein erstes HTML und siehst es sofort im Browser.
 section: html
 ---
 
-Jetzt ersetzt du die Willkommensseite von Nuxt durch deine eigene Seite. Sorge dafür, dass der Entwicklungsserver läuft (`npm run dev`) und die App im Browser offen ist. Stell Browser und VS Code am besten nebeneinander.
+Jetzt ersetzt du die Willkommensseite von Nuxt durch deine eigene Seite. Dafür muss der Entwicklungsserver laufen. Falls nicht, starte ihn im Terminal:
+
+```bash
+npm run dev
+```
+
+Öffne die App im Browser und stell Browser und VS Code am besten nebeneinander.
 
 ## Das Template
 
 Öffne in VS Code die Datei `app/app.vue`. Alles, was auf der Seite erscheinen soll, steht zwischen `<template>` und `</template>`.
 
-Das **Template** ist der Teil einer `.vue`-Datei, der beschreibt, was auf der Seite zu sehen ist. Geschrieben wird es in HTML, der Sprache für den Inhalt von Webseiten.
+Eine **Vue-Datei**, erkennbar an der Endung `.vue`, enthält ein Stück deiner App. Das **Template** ist der Teil einer Vue-Datei, der beschreibt, was auf der Seite zu sehen ist. Geschrieben wird es in HTML, der Sprache für den Inhalt von Webseiten.
 
 ## Tags
 
@@ -52,8 +58,8 @@ Wenn es geklappt hat, steht dein Satz im Browser in normaler Schrift unter der �
 
 - **Im Browser ändert sich nichts:** Du hast die Datei noch nicht gespeichert. Ein Punkt neben dem Dateinamen im Reiter von VS Code zeigt ungespeicherte Änderungen an.
 - **Der Browser zeigt eine Fehlermeldung statt deiner Seite:** Meist fehlt ein schließendes Tag oder der Schrägstrich darin. Zu jedem `<p>` gehört ein `</p>`. Korrigiere die Stelle und speichere, dann verschwindet die Meldung.
-- **Dein Satz erscheint trotz Speichern nicht:** Er steht vermutlich außerhalb des Templates, also nach `</template>`. Alles Sichtbare muss zwischen `<template>` und `</template>` stehen.
-- **Die Seite ist nicht erreichbar:** Der Entwicklungsserver läuft nicht. Starte ihn im Terminal mit `npm run dev`.
+- **Die Fehlermeldung bleibt, obwohl alle Tags geschlossen sind:** Der Absatz steht vermutlich außerhalb des Templates, also nach `</template>`. Alles Sichtbare muss zwischen `<template>` und `</template>` stehen.
+- **Die Seite ist nicht erreichbar:** Der Entwicklungsserver läuft nicht. Starte ihn mit dem Befehl vom Anfang der Lektion.
 
 <!-- loesung -->
 

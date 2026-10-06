@@ -4,11 +4,11 @@ summary: Die App reagiert auf Maus und Tastatur, passt aufs Handy und zeigt erle
 section: css
 ---
 
-Die App sieht schon gut aus. Jetzt kommen die Kleinigkeiten, die sie fertig wirken lassen.
+Jetzt kommen die Kleinigkeiten, die deine App fertig wirken lassen.
 
 ## Klassen, die nur manchmal gelten
 
-Bisher gilt jede Klasse immer. Mit einem Wort und einem Doppelpunkt davor gilt sie nur in einer bestimmten Lage. `hover:` heißt: nur solange der Mauszeiger auf dem Tag steht.
+Bisher gilt jede Klasse immer. Mit einem Wort und einem Doppelpunkt davor gilt sie nur in einer bestimmten Lage. `hover:` heißt: nur solange der Mauszeiger auf dem Tag steht. Diesen Zustand nennt man **Hover**.
 
 Ergänze am Button mit dem Plus die Klassen ab `transition-colors`. Neu ist außerdem `shrink-0`, dazu gleich mehr:
 
@@ -28,7 +28,7 @@ Speichere und fahre mit der Maus über den Button. Er wird etwas dunkler.
 - `transition-colors` lässt Farben weich wechseln statt schlagartig.
 - `focus-visible:` gilt, wenn jemand den Button mit der Tastatur ansteuert. Die drei Klassen zeichnen dann einen Ring: `outline-2` ist seine Dicke, `outline-offset-2` sein Abstand zum Button, `outline-indigo-600` seine Farbe.
 
-Probier es aus: Klicke in das Eingabefeld und drücke die Tabulatortaste. Um den Button erscheint ein Ring. Wer ohne Maus arbeitet, sieht so, wo er gerade ist.
+Probier es aus: Klicke in das Eingabefeld und drücke die Tabulatortaste. Um den Button erscheint ein Ring. In Safari auf dem Mac drückst du dafür Option+Tab. Wer ohne Maus arbeitet, sieht so, wo er gerade ist.
 
 ## Das Eingabefeld
 
@@ -38,21 +38,21 @@ Auch das Eingabefeld bekommt solche Klassen. Ergänze sein `class` so:
 class="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-2 text-slate-900 placeholder:text-slate-400 focus:border-indigo-600 focus:outline-none"
 ```
 
-`placeholder:` gilt für den Hinweistext, er wird heller. `focus:` gilt, sobald das Feld ausgewählt ist, egal ob mit Maus oder Tastatur. `focus:outline-none` entfernt den Ring, den der Browser von sich aus zeichnet, und `focus:border-indigo-600` färbt dafür den Rahmen.
+`placeholder:` gilt für den Hinweistext, er wird heller. `focus:` gilt, sobald das Feld ausgewählt ist, egal ob mit Maus oder Tastatur. `focus:outline-none` entfernt den Ring, den der Browser von sich aus zeichnet, und `focus:border-indigo-600` färbt dafür den Rahmen. Was `min-w-0` tut, steht gleich bei der Handy-Ansicht.
 
 Klicke in das Feld: Der Rahmen wird blauviolett.
 
 ## Die Ansicht am Handy
 
-Viele Menschen öffnen Webseiten am Handy. Wie deine App dort aussieht, prüfst du am Rechner: Öffne im Browser die Entwicklerwerkzeuge mit F12, auf dem Mac mit Cmd+Option+I. Dort gibt es einen Knopf mit einem Handy-Symbol, der die Seite schmal wie auf einem Handy anzeigt. Noch einfacher: Zieh das Browserfenster so schmal wie möglich.
+Viele Menschen öffnen Webseiten am Handy. Wie deine App dort aussieht, prüfst du am Rechner: Zieh das Browserfenster so schmal wie möglich. Das geht in jedem Browser.
+
+Genauer zeigen es die Entwicklerwerkzeuge. In Chrome, Edge und Firefox öffnest und schließt du sie mit F12, auf dem Mac mit Cmd+Option+I. Dort zeigt ein Knopf mit Handy-Symbol die Seite wie auf einem Handy an.
 
 Die Karte passt sich an. Eng wird es erst bei langen Texten. Dafür gibt es drei Klassen:
 
 - `shrink-0` verbietet einem Tag in einer Flex-Zeile, schmaler zu werden. So bleibt ein Button immer ganz.
 - `min-w-0` erlaubt einem Tag in einer Flex-Zeile, schmaler zu werden als sein Inhalt. So ragt nichts aus der Karte.
 - `break-words` bricht auch ein sehr langes Wort in die nächste Zeile um.
-
-Schließe die Entwicklerwerkzeuge danach wieder mit F12.
 
 ## Erledigt
 
@@ -61,7 +61,7 @@ Schließe die Entwicklerwerkzeuge danach wieder mit F12.
 ## Deine Aufgabe
 
 1. Die Papierkörbe und „Alle löschen“ werden rot (`red-600`), wenn die Maus darauf steht, mit weichem Übergang.
-2. Die Kreise und die Papierkörbe in der Liste bekommen denselben Tastatur-Ring wie der Button mit dem Plus. Ein offener Kreis bekommt unter der Maus einen blauvioletten Rahmen.
+2. Die Kreise und die Papierkörbe in der Liste bekommen denselben Tastatur-Ring wie der Button mit dem Plus. Ein offener Kreis bekommt unter der Maus einen blauvioletten Rahmen. Auch die Kreise wechseln ihre Farben weich.
 3. Die Kreise dürfen nicht schmaler werden, und ein langer Aufgabentext soll umbrechen, statt aus der Karte zu ragen.
 4. Gestalte die erste Aufgabe als erledigt: Der Text ist heller grau und durchgestrichen, der Kreis blauviolett gefüllt mit einem weißen Häkchen. Ihr Kreis heißt jetzt „Als offen markieren“.
 
@@ -75,6 +75,8 @@ Wenn es geklappt hat, sieht die erste Aufgabe abgehakt aus. Ersetze zum Testen e
 - **Der Ring erscheint beim Klicken mit der Maus nicht:** Das soll so sein. `focus-visible:` reagiert bei Buttons nur auf die Tastatur.
 
 <!-- loesung -->
+
+Die Reihenfolge der Klassen spielt keine Rolle. Bei den Kreisen stehen hier zuerst die Klassen, die für alle gleich sind, und dahinter die für „offen“ oder „erledigt“.
 
 ```vue [app/app.vue]
 <script setup>

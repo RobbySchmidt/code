@@ -8,7 +8,7 @@ Buttons mit Wörtern brauchen viel Platz. Ein **Icon** ist ein kleines Bildsymbo
 
 ## Lucide installieren
 
-**Lucide** ist eine kostenlose Sammlung von über tausend Icons. Stoppe den Entwicklungsserver mit Strg+C und installiere sie:
+**Lucide** ist eine kostenlose Sammlung von über tausend Icons. Stoppe den Entwicklungsserver mit Strg+C, auf dem Mac mit Control+C, und installiere sie:
 
 ```bash
 npm install @lucide/vue
@@ -44,7 +44,7 @@ Speichere. Links neben der Überschrift siehst du jetzt eine kleine blauviolette
 Dazu vier Hinweise:
 
 - Der Name in den geschweiften Klammern und der Name des Tags müssen genau gleich sein, auch in Groß- und Kleinschreibung.
-- Ein Icon hat keinen Inhalt. Deshalb schließt es sich mit `/>` am Ende selbst.
+- Ein Icon hat keinen Inhalt und schließt sich deshalb mit `/>` selbst.
 - `size-7` legt Breite und Höhe auf einmal fest. Die Zahlen sind dieselben Stufen wie bei den Abständen.
 - Ein Icon nimmt die Schriftfarbe an. Mit `text-indigo-600` färbst du es also wie einen Text.
 
@@ -54,13 +54,13 @@ Brauchst du mehrere Icons, schreibst du ihre Namen mit Kommas getrennt in die ge
 
 Manche Menschen lassen sich Webseiten von einem Programm vorlesen, weil sie den Bildschirm nicht sehen. Bei einem Button, der nur ein Icon enthält, wüsste es nicht, was es vorlesen soll.
 
-Dafür gibt es das Attribut `aria-label`. Sein Wert ist ein Text, der nicht angezeigt, aber vorgelesen wird. Auch das Eingabefeld hat bisher keinen solchen Namen, denn der graue Hinweistext zählt nicht. Ergänze dort:
+Dafür gibt es das Attribut `aria-label`. Sein Wert ist ein Text, der nicht angezeigt, aber vorgelesen wird. Auch das Eingabefeld braucht einen solchen Namen, denn auf den grauen Hinweistext ist dafür nicht überall Verlass. Ergänze dort:
 
 ```vue
 aria-label="Neue Aufgabe"
 ```
 
-Im Browser siehst du davon nichts. Das ist richtig so.
+Im Browser siehst du davon nichts.
 
 ## Drei Klassen für Icon-Buttons
 

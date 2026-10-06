@@ -20,7 +20,7 @@ Stoppe den Entwicklungsserver im Terminal mit Strg+C, auf dem Mac mit Control+C.
 npm install tailwindcss @tailwindcss/vite
 ```
 
-Nach einem Moment meldet npm, dass Pakete hinzugefügt wurden („added“). In der `package.json` stehen die beiden Namen jetzt unter `dependencies`.
+Nach einem Moment meldet npm, dass Pakete hinzugefügt wurden („added“).
 
 ## Tailwind einschalten
 
@@ -41,7 +41,7 @@ export default defineNuxtConfig({
 })
 ```
 
-Neu sind die erste Zeile, die Zeile mit `css` und der Block `vite`. Sie holen Tailwind ins Projekt und nennen die CSS-Datei, die gleich entsteht. Die Endung `.ts` steht für TypeScript, eine Variante von JavaScript. Die Datei heißt bei Nuxt immer so. TypeScript lernen musst du dafür nicht.
+Neu sind die erste Zeile, die Zeile mit `css` und der Block `vite`. Sie holen Tailwind ins Projekt und nennen die CSS-Datei, die gleich entsteht. Die Endung `.ts` steht für **TypeScript**, eine Variante von JavaScript. Die Datei heißt bei Nuxt immer so. TypeScript lernen musst du dafür nicht.
 
 Lege jetzt die CSS-Datei an. Klicke in VS Code mit der rechten Maustaste auf den Ordner `app`, wähle „New File“ („Neue Datei“) und tippe als Namen `assets/css/main.css`. VS Code legt die beiden Ordner gleich mit an. In die Datei kommt eine einzige Zeile:
 
@@ -49,7 +49,7 @@ Lege jetzt die CSS-Datei an. Klicke in VS Code mit der rechten Maustaste auf den
 @import "tailwindcss";
 ```
 
-Speichere beide Dateien und starte den Server wieder mit `npm run dev`.
+Speichere beide Dateien und starte den Server wieder mit `npm run dev`. Lade die Seite im Browser neu, falls sie sich nicht von selbst aktualisiert.
 
 Im Browser sieht die Seite jetzt schlichter aus als vorher: Die Überschrift ist so klein wie normaler Text, Eingabefeld und Buttons haben keinen Rahmen mehr, die Punkte vor den Einträgen fehlen. Das ist das Zeichen, dass Tailwind läuft. Es räumt das Aussehen, das der Browser von sich aus mitbringt, erst einmal weg, damit du alles selbst bestimmen kannst.
 

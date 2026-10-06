@@ -4,7 +4,7 @@ summary: Du legst dein Nuxt-Projekt an, startest es und siehst es zum ersten Mal
 section: start
 ---
 
-Ein **Projekt** ist ein Ordner, in dem alle Dateien deiner App liegen. Du musst ihn nicht von Hand füllen: Nuxt bringt einen Helfer mit, der ein startfertiges Projekt für dich anlegt.
+Ein **Projekt** ist ein Ordner, in dem alle Dateien deiner App liegen. Du musst ihn nicht von Hand füllen: **Nuxt**, das Werkzeug, mit dem du die App baust, bringt einen Helfer mit, der ein startfertiges Projekt anlegt.
 
 ## Das Projekt anlegen
 
@@ -20,13 +20,13 @@ Starte jetzt den Helfer. Das letzte Wort ist der Name deines Projektordners:
 npm create nuxt@latest todo-app
 ```
 
-Der Helfer stellt dir nacheinander ein paar Fragen auf Englisch. Eine Auswahl triffst du mit den Pfeiltasten und bestätigst sie mit der Eingabetaste. Der Wortlaut kann bei dir etwas anders sein, weil der Helfer weiterentwickelt wird. Halte dich dann an den Sinn der Frage.
+Der Helfer stellt dir nacheinander ein paar Fragen auf Englisch. Eine Auswahl triffst du mit den Pfeiltasten und bestätigst sie mit der Eingabetaste. Der Wortlaut kann bei dir etwas anders sein, weil der Helfer weiterentwickelt wird. Halte dich dann an ihren Sinn.
 
 1. Möglicherweise fragt zuerst npm, ob es den Helfer `create-nuxt` herunterladen darf. Bestätige mit der Eingabetaste.
 2. **Welche Vorlage?** Wähle `minimal`, die kleinste Vorlage. Sie ist als empfohlen markiert.
-3. **Welcher Paketmanager?** Wähle `npm`. Ein Paketmanager ist ein Programm, das Bausteine herunterlädt, und npm hast du schon.
+3. **Welcher Paketmanager?** Wähle `npm`. Ein **Paketmanager** ist ein Programm, das Bausteine herunterlädt, und npm hast du schon.
 4. Danach lädt der Helfer Nuxt herunter. Das kann einige Minuten dauern.
-5. **Git-Repository anlegen?** Wähle „No“. Git ist ein Werkzeug, das Änderungen an Dateien festhält. In diesem Kurs brauchst du es nicht.
+5. **Git-Repository anlegen?** Wähle „No“. **Git** ist ein Werkzeug, das Änderungen an Dateien festhält. In diesem Kurs brauchst du es nicht.
 6. **Module ansehen und installieren?** Wähle „No“.
 
 Am Ende zeigt der Helfer die nächsten Schritte an, darunter `cd todo-app` und `npm run dev`. Dann hat alles geklappt.
@@ -53,7 +53,7 @@ Zeigt das Terminal am Ende eine andere Zahl, zum Beispiel `3001`, dann nimm gena
 
 Du solltest eine Willkommensseite von Nuxt sehen. Am unteren Rand erscheint vielleicht ein kleines Nuxt-Symbol. Es gehört zu einem Entwicklerwerkzeug, das du in diesem Kurs nicht brauchst.
 
-Der Server läuft, bis du ihn mit Strg+C stoppst, auf dem Mac mit Control+C. Lass ihn beim Arbeiten einfach laufen.
+Der Server läuft, bis du ihn mit Strg+C stoppst, auf dem Mac mit Control+C.
 
 ## Den Ordner in VS Code öffnen
 
