@@ -50,7 +50,8 @@ Nur unter Windows kann noch etwas anderes passieren: `node --version` funktionie
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 ```
 
-Der Befehl erlaubt deinem Benutzerkonto, Skripts auszuführen, die auf deinem Computer installiert sind. Für andere Benutzer ändert er nichts. PowerShell fragt eventuell nach einer Bestätigung, die du mit J oder Y beantwortest. 
+Der Befehl erlaubt deinem Benutzerkonto, Skripts auszuführen, die auf deinem Computer installiert sind. Für andere Benutzer ändert er nichts. PowerShell fragt eventuell nach einer Bestätigung, die du mit J oder Y beantwortest.
+
 ## Sich im Ordnersystem bewegen
 
 Das Terminal ist immer in einem **Ordner**. Mit diesen Befehlen bewegst du dich darin:
@@ -66,7 +67,8 @@ Schau dir zuerst an, wo du gerade bist:
 ls
 ```
 
-Du siehst die Namen der Ordner und Dateien, die in diesem Ordner liegen. 
+Du siehst die Namen der Ordner und Dateien, die in diesem Ordner liegen.
+
 Lege jetzt einen Ordner für deine Arbeit an. Er entsteht in dem Ordner, in dem das Terminal gerade steht:
 
 ```bash
